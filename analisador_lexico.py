@@ -1,5 +1,3 @@
-from carregar_codigo import carregar_codigo
-
 def carregar_tokens(programa):
     tokens = []
     i = 0  # índice para percorrer o programa
@@ -20,34 +18,12 @@ def carregar_tokens(programa):
                 identificador += programa[i]
                 i += 1
 
-            if identificador == 'int':
-                tokens.append({'tipo': 'INT', 'valor': identificador})
-            elif identificador == 'boolean':
-                tokens.append({'tipo': 'BOOLEAN', 'valor': identificador})
-            elif identificador == 'func':
-                tokens.append({'tipo': 'FUNC', 'valor': identificador})
-            elif identificador == 'begin':
-                tokens.append({'tipo': 'BEGIN', 'valor': identificador})
-            elif identificador == 'end':
-                tokens.append({'tipo': 'END', 'valor': identificador})
-            elif identificador == 'if':
-                tokens.append({'tipo': 'IF', 'valor': identificador})
-            elif identificador == 'else':
-                tokens.append({'tipo': 'ELSE', 'valor': identificador})
-            elif identificador == 'while':
-                tokens.append({'tipo': 'WHILE', 'valor': identificador})
-            elif identificador == 'return':
-                tokens.append({'tipo': 'RETURN', 'valor': identificador})
-            elif identificador == 'break':
-                tokens.append({'tipo': 'BREAK', 'valor': identificador})
-            elif identificador == 'continue':
-                tokens.append({'tipo': 'CONTINUE', 'valor': identificador})
-            elif identificador == 'print':
-                tokens.append({'tipo': 'PRINT', 'valor': identificador})
-            elif identificador == 'true' or identificador == 'false':
-                tokens.append({'tipo': 'BOOLEAN_LITERAL', 'valor': identificador})
+            palavras_chave = ['programa', 'int', 'boolean', 'begin', 'end', 'return', 'if', 'else', 'while', 'break', 'continue', 'print']
+            if identificador in palavras_chave:
+                tokens.append({'tipo': identificador.upper(), 'valor': identificador})
             else:
                 tokens.append({'tipo': 'IDENTIFICADOR', 'valor': identificador})
+
 
         # Números
         elif char.isdigit():
@@ -65,7 +41,8 @@ def carregar_tokens(programa):
             if i < len(programa) and programa[i] == '=':
                 operador_relacional += '='
                 i += 1
-            tokens.append({'tipo': 'OP_RELACIONAL', 'valor': operador_relacional})
+            tokens.append({'tipo': 'OP_RELACIONAL',
+                          'valor': operador_relacional})
 
         # Operadores aritméticos
         elif char in "+-*/":
@@ -79,4 +56,18 @@ def carregar_tokens(programa):
 
     return tokens
 
+def carregar_codigo(codigo):
+    # Ler o txt com o código
+    with open(codigo, 'r') as arquivo:
+        linha = arquivo.read()
+        return linha
 
+codigo = 'codigo.txt'
+
+# Carrega o código de um TXT
+programa_exemplo = carregar_codigo(codigo)
+
+tokens_encontrados = carregar_tokens(programa_exemplo)
+
+for token in tokens_encontrados:
+    print(token)
