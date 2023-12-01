@@ -1,4 +1,4 @@
-from analisador_lexico import carregar_codigo, carregar_tokens
+from analisador_lexico import *
 
 
 def programa(tokens):
@@ -38,15 +38,5 @@ def match(tokens, terminal):
 # Variável global para navegar na lista de tokens
 posicao: int = 0
 
-# Nome do arquivo contendo o código
-codigo = 'codigo_2.txt'
-
-# Carrega o código de um arquivo TXT
-programa_exemplo = carregar_codigo(codigo)
-
-# Obtém os tokens do programa
-tokens_encontrados = carregar_tokens(programa_exemplo)
-
 # Crie uma instância do analisador sintático e realize a análise
 programa(tokens_encontrados)
-
