@@ -13,6 +13,13 @@ def carregar_tokens(programa):
             i += 1
             continue
 
+        # Comentários
+        if char == '#':
+            i += 1
+            while i < len(programa) and programa[i] != '\n':
+                i += 1
+            continue
+
         # Identificadores e palavras-chave
         if char.isalpha() or char == '_':
             identificador = char
@@ -60,6 +67,20 @@ def carregar_tokens(programa):
             # Adiciona o operador aritmético ao token
             tokens.append({'tipo': 'OP_ARITMETICO', 'valor': char})
             i += 1
+
+        # Literal de String
+        elif char == '"':
+            i += 1
+            string = ''
+            while i < len(programa) and programa[i] != '"':
+                string += programa[i]
+                i += 1
+            if i < len(programa) and programa[i] == '"':
+                i += 1
+                tokens.append({'tipo': 'STRING', 'valor': string})
+            else:
+                # Erro: String não fechada
+                print("Erro: String não fechada")
 
         # Outros caracteres especiais
         else:
