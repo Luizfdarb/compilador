@@ -79,7 +79,7 @@ def carregar_codigo(codigo):
 
 
 # Nome do arquivo contendo o código
-codigo = 'codigo.txt'
+codigo = 'codigo_2.txt'
 
 # Carrega o código de um arquivo TXT
 programa_exemplo = carregar_codigo(codigo)
