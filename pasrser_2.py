@@ -1,51 +1,68 @@
-from analisador_lexico import carregar_codigo, carregar_tokens
+from analisador_lexico import *
 
+class AnalisadorSintatico:
+    def __init__(self, tokens, codigo):
+        self.tokens = tokens
+        self.posicao = 0
+        self.codigo = codigo
 
-def programa(tokens):
-    global posicao
-    try:
-        match(tokens, 'PROGRAMA')
-        identificador(tokens)
-        match(tokens, ';')
-        #bloco()
-    except Exception as e:
-        print(f"{e}")
+    def analise_sintatica(self):
+        try:
+            self.programa()
+        except Exception as e:
+            print(f"{e}")
 
+    def programa(self):
+        self.match('PROGRAMA')
+        self.identificador()
+        self.match(';')
+        # self.bloco()
 
-def identificador(tokens):
-    global posicao
-    if tokens[posicao]['tipo'] == 'IDENTIFICADOR':
-        # Verifica se é uma posição válida do vetor tokens
-        if(posicao < len(tokens) - 1):
-            posicao = posicao + 1
+    def identificador(self):
+        if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
+            self.avancar()
+        else:
+            linha = self.carregar_linhas_codigo()
+            raise SyntaxError(f"Erro de sintaxe: Identificador inválido \"{self.tokens[self.posicao]['tipo']}\" na linha {linha}")
+
+    def match(self, terminal):
+        if self.tokens[self.posicao]['tipo'] == terminal:
+            self.avancar()
+        else:
+            linha = 1
+            raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {linha}, mas encontrado {self.tokens[self.posicao]['tipo']}")
+
+    def avancar(self):
+        if self.posicao < len(self.tokens) - 1:
+            self.posicao += 1
         else:
             raise SyntaxError("Compilado")
-    else:
-        raise SyntaxError("Erro de sintaxe: Identificador inválido")
 
-def match(tokens, terminal):
-    global posicao
-    if tokens[posicao]['tipo'] == terminal:
-        # Verifica se é uma posição válida do vetor tokens
-        if (posicao < len(tokens) - 1):
-            posicao = posicao + 1
-        else:
-            raise SyntaxError("Compilado")
-    else:
-        raise SyntaxError(f"Erro de sintaxe: Esperado {terminal}, mas encontrado {tokens[posicao]['tipo']}")
+    def carregar_linhas_codigo(self):
+        linhas_codigo = []
+        # Ler o txt com o código
+        with open(self.codigo, 'r') as arquivo:
+            linha = arquivo.read()
+            # Remove os espaços do código
+            linhas_codigo = linha.replace(' ', '')
 
+            # Salva as linhas de código
+            linhas_codigo = linhas_codigo.split()
 
-# Variável global para navegar na lista de tokens
-posicao: int = 0
+            linha = 1
+            for i in linhas_codigo:
+                if i.find(self.tokens[self.posicao]['tipo']) >= 0:
+                    break
+                linha = linha + 1
+
+        return linha
 
 # Nome do arquivo contendo o código
-codigo = 'codigo_2.txt'
-
-# Carrega o código de um arquivo TXT
-programa_exemplo = carregar_codigo(codigo)
+codigo = "codigo_2.txt"
 
 # Obtém os tokens do programa
 tokens_encontrados = carregar_tokens(programa_exemplo)
 
 # Crie uma instância do analisador sintático e realize a análise
-programa(tokens_encontrados)
+analisador = AnalisadorSintatico(tokens_encontrados, codigo)
+analisador.analise_sintatica()
