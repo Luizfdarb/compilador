@@ -16,7 +16,7 @@ class AnalisadorSintatico:
         self.match('PROGRAMA')
         self.identificador()
         self.match(';')
-        # self.bloco()
+        self.bloco()
 
     def identificador(self):
         if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
@@ -31,6 +31,25 @@ class AnalisadorSintatico:
         else:
             linha = 1
             raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {linha}, mas encontrado {self.tokens[self.posicao]['tipo']}")
+
+    def bloco(self):
+        while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN', 'FUNC']:
+            self.declaracao_variaveis()
+        # while self.tokens[self.index]['tipo'] == 'FUNC':
+        #     self.declaracao_funcao()
+        # while self.tokens[self.index]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE', 'PRINT']:
+        #     self.comando()
+
+    def declaracao_variaveis(self):
+        self.tipo()
+        self.identificador()
+        self.match(';')
+
+    def tipo(self):
+        if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
+            self.avancar()
+        else:
+            raise SyntaxError("Erro de sintaxe: Tipo inválido")
 
     def avancar(self):
         if self.posicao < len(self.tokens) - 1:
@@ -49,7 +68,7 @@ class AnalisadorSintatico:
             # Salva as linhas de código
             linhas_codigo = linhas_codigo.split()
 
-            linha = 1
+            linha = 0
             for i in linhas_codigo:
                 if i.find(self.tokens[self.posicao]['tipo']) >= 0:
                     break
