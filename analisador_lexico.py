@@ -10,7 +10,6 @@ class AnalisadorLexico:
         # Lê o conteúdo do arquivo TXT que contém o código
         with open(self.arquivo, 'r') as arquivo:
             linha = arquivo.read()
-            print(linha)
             return linha
 
     def carregar_linhas(self):
@@ -169,8 +168,8 @@ programa_exemplo = AnalisadorLexico(codigo)
 # Obtém os tokens do programa
 tokens_encontrados = programa_exemplo.carregar_tokens()
 
-print(programa_exemplo.carregar_linhas())
+#print(programa_exemplo.carregar_linhas())
 
 # Exibe os tokens encontrados
-for token in tokens_encontrados:
-    print(token)
+# for token in tokens_encontrados:
+#     print(token)
