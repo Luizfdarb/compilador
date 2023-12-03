@@ -29,6 +29,7 @@ class AnalisadorLexico:
 
         # Loop para percorrer o programa
         while self.indice < len(self.codigo):
+            print(self.linhas)
             char = self.codigo[self.indice]
 
             # Ignorar espaços em branco e quebras de linha
@@ -59,7 +60,7 @@ class AnalisadorLexico:
                     for i, string in enumerate(self.linhas):
                         if identificador in string:
                             linha = i + 1
-                            self.linhas[i] = string.replace(char, '', 1)
+                            self.linhas[i] = string.replace(identificador, '', 1)
                             break
                     self.tokens.append(
                         {'tipo': identificador.upper(), 'valor': identificador, 'linha': linha})
@@ -67,7 +68,7 @@ class AnalisadorLexico:
                     for i, string in enumerate(self.linhas):
                         if identificador in string:
                             linha = i + 1
-                            self.linhas[i] = string.replace(char, '', 1)
+                            self.linhas[i] = string.replace(identificador, '', 1)
                             break
                     self.tokens.append(
                         {'tipo': 'IDENTIFICADOR', 'valor': identificador, 'linha': linha})
@@ -82,10 +83,11 @@ class AnalisadorLexico:
                     self.indice += 1
                 # Percorre o vetor de linhas
                 for i, string in enumerate(self.linhas):
-                    if numero in string:
+                    if char in string:
                         linha = i + 1
                         self.linhas[i] = string.replace(char, '', 1)
                         break
+                print(self.linhas)
                 # Adiciona o número ao token
                 self.tokens.append({'tipo': 'NUMERO', 'valor': numero, 'linha': linha})
 
@@ -159,17 +161,17 @@ class AnalisadorLexico:
 
 
 
-# Nome do arquivo contendo o código
-codigo = 'codigo_2.txt'
-
-# Carrega o código de um arquivo TXT
-programa_exemplo = AnalisadorLexico(codigo)
-
-# Obtém os tokens do programa
-tokens_encontrados = programa_exemplo.carregar_tokens()
-
-#print(programa_exemplo.carregar_linhas())
-
-# Exibe os tokens encontrados
+# # Nome do arquivo contendo o código
+# codigo = 'codigo_2.txt'
+#
+# # Carrega o código de um arquivo TXT
+# programa_exemplo = AnalisadorLexico(codigo)
+#
+# # Obtém os tokens do programa
+# tokens_encontrados = programa_exemplo.carregar_tokens()
+#
+# print(programa_exemplo.carregar_linhas())
+# #
+# # #Exibe os tokens encontrados
 # for token in tokens_encontrados:
 #     print(token)
