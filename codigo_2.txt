@@ -1,3 +1,4 @@
-programa exemplo;
-
-int valor;
+programa exemplo 1;
+boolean var;
+int var;
+boolean i;
