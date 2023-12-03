@@ -29,7 +29,6 @@ class AnalisadorLexico:
 
         # Loop para percorrer o programa
         while self.indice < len(self.codigo):
-            print(self.linhas)
             char = self.codigo[self.indice]
 
             # Ignorar espaços em branco e quebras de linha
@@ -87,7 +86,6 @@ class AnalisadorLexico:
                         linha = i + 1
                         self.linhas[i] = string.replace(char, '', 1)
                         break
-                print(self.linhas)
                 # Adiciona o número ao token
                 self.tokens.append({'tipo': 'NUMERO', 'valor': numero, 'linha': linha})
 
