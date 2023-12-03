@@ -1,10 +1,10 @@
 from analisador_lexico import *
 
 class AnalisadorSintatico:
-    def __init__(self, tokens, codigo):
-        self.tokens = tokens
+    def __init__(self, tokens):
         self.posicao = 0
         self.codigo = codigo
+        self.tokens = tokens
 
     def analise_sintatica(self):
         try:
@@ -22,21 +22,17 @@ class AnalisadorSintatico:
         if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
             self.avancar()
         else:
-            linha = self.carregar_linhas_codigo()
-            raise SyntaxError(f"Erro de sintaxe: Identificador inválido \"{self.tokens[self.posicao]['tipo']}\" na linha {linha}")
+            raise SyntaxError(f"Erro de sintaxe: Identificador inválido \"{self.tokens[self.posicao]['tipo']}\" na linha {self.tokens[self.posicao]['linha']}")
 
     def match(self, terminal):
         if self.tokens[self.posicao]['tipo'] == terminal:
             self.avancar()
         else:
-            linha = 1
-            raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {linha}, mas encontrado {self.tokens[self.posicao]['tipo']}")
+            raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {self.tokens[self.posicao]['linha']}, mas encontrado {self.tokens[self.posicao]['tipo']}")
 
     def bloco(self):
-        while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN', 'FUNC']:
+        while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             self.declaracao_variaveis()
-        # while self.tokens[self.index]['tipo'] == 'FUNC':
-        #     self.declaracao_funcao()
         # while self.tokens[self.index]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE', 'PRINT']:
         #     self.comando()
 
@@ -49,7 +45,17 @@ class AnalisadorSintatico:
         if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             self.avancar()
         else:
-            raise SyntaxError("Erro de sintaxe: Tipo inválido")
+            raise SyntaxError(f"Erro de sintaxe: Tipo inválido na linha {self.tokens[self.posicao]['linha']}")
+
+    def declaracao_funcao(self):
+        self.match('FUNC')
+        self.tipo()
+        self.identificador()
+        self.match('(')
+        if self.tokens[self.index]['tipo'] in ['INT', 'BOOLEAN']:
+            self.parametro()
+        self.match(')')
+        self.bloco_funcao()
 
     def avancar(self):
         if self.posicao < len(self.tokens) - 1:
@@ -57,31 +63,19 @@ class AnalisadorSintatico:
         else:
             raise SyntaxError("Compilado")
 
-    def carregar_linhas_codigo(self):
-        linhas_codigo = []
-        # Ler o txt com o código
-        with open(self.codigo, 'r') as arquivo:
-            linha = arquivo.read()
-            # Remove os espaços do código
-            linhas_codigo = linha.replace(' ', '')
 
-            # Salva as linhas de código
-            linhas_codigo = linhas_codigo.split()
 
-            linha = 0
-            for i in linhas_codigo:
-                if i.find(self.tokens[self.posicao]['tipo']) >= 0:
-                    break
-                linha = linha + 1
-
-        return linha
 
 # Nome do arquivo contendo o código
 codigo = "codigo_2.txt"
 
+# Carrega o código de um arquivo TXT
+programa_exemplo = AnalisadorLexico(codigo)
+
 # Obtém os tokens do programa
-tokens_encontrados = carregar_tokens(programa_exemplo)
+tokens_encontrados = programa_exemplo.carregar_tokens()
+
 
 # Crie uma instância do analisador sintático e realize a análise
-analisador = AnalisadorSintatico(tokens_encontrados, codigo)
+analisador = AnalisadorSintatico(tokens_encontrados)
 analisador.analise_sintatica()
