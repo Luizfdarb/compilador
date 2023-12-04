@@ -165,7 +165,7 @@ class AnalisadorSintatico:
             self.avancar()
             self.fator()
         else:
-            raise SyntaxError("Erro de sintaxe: Fator inválido")
+            raise SyntaxError(f"Erro de sintaxe: Fator {self.tokens[self.posicao]['tipo']} inválido ")
 
     def bloco_enquanto(self):
         self.match('BEGIN')
@@ -177,6 +177,18 @@ class AnalisadorSintatico:
             self.avancar()
         else:
             raise SyntaxError("Erro de sintaxe: Comando de desvio incondicional inválido")
+
+    def escrita(self):
+        self.match('PRINT')
+        self.match('(')
+        if self.tokens[self.posicao]['tipo'] == '\'' or self.tokens[self.posicao]['tipo'] == '\"':
+            self.match('\'')
+            self.identificador()
+            self.match('\'')
+        else:
+            self.expressao()
+        self.match(')')
+        self.match(';')
 
 
 
