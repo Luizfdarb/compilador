@@ -35,11 +35,6 @@ class AnalisadorSintatico:
             raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {self.tokens[self.posicao]['linha']}, mas encontrado {self.tokens[self.posicao]['tipo']}")
 
     def bloco(self):
-
-        # Verifica se o bloco está varizo
-        if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
-            raise SyntaxError(
-                f"Erro de sintaxe: Bloco vazio {self.tokens[self.posicao]['linha']}")
         while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             if self.tokens[self.posicao + 1]['tipo'] == 'FUNC':
                 self.declaracao_funcao()
@@ -47,7 +42,6 @@ class AnalisadorSintatico:
                 self.declaracao_variaveis()
         while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE', 'PRINT']:
             self.comando()
-
 
     def declaracao_variaveis(self):
         self.tipo()
@@ -135,48 +129,7 @@ class AnalisadorSintatico:
         else:
             raise SyntaxError("Erro de sintaxe: Comando inválido")
 
-    def enquanto(self):
-        self.match('WHILE')
-        self.match('(')
-        self.expressao()
-        self.match(')')
-        self.match(';')
-        self.bloco_enquanto()
 
-
-    def termo(self):
-        self.fator()
-        while self.tokens[self.posicao]['tipo'] in ['*', '/']:
-            self.op_multiplicativo()
-            self.fator()
-
-    def fator(self):
-        if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
-            self.identificador()
-        elif self.tokens[self.posicao]['tipo'] == 'NUMERO':
-            self.avancar()
-        elif self.tokens[self.posicao]['tipo'] == '(':
-            self.avancar()
-            self.expressao()
-            self.match(')')
-        elif self.tokens[self.posicao]['tipo'] in ['TRUE', 'FALSE']:
-            self.avancar()
-        elif self.tokens[self.posicao]['tipo'] == 'NAO':
-            self.avancar()
-            self.fator()
-        else:
-            raise SyntaxError("Erro de sintaxe: Fator inválido")
-
-    def bloco_enquanto(self):
-        self.match('BEGIN')
-        self.bloco()
-        self.match('END')
-
-    def comando_desvio_incondicional(self):
-        if self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE']:
-            self.avancar()
-        else:
-            raise SyntaxError("Erro de sintaxe: Comando de desvio incondicional inválido")
 
 
 
