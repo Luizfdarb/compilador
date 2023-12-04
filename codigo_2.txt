@@ -1,5 +1,3 @@
 programa exemplo1;
-int func var(int x);
-begin
 int x;
-end
+x = x + y;
