@@ -40,8 +40,8 @@ class AnalisadorSintatico:
                 self.declaracao_funcao()
             else:
                 self.declaracao_variaveis()
-        # while self.tokens[self.index]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE', 'PRINT']:
-        #     self.comando()
+        while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE', 'PRINT']:
+            self.comando()
 
     def declaracao_variaveis(self):
         self.tipo()
@@ -106,6 +106,30 @@ class AnalisadorSintatico:
         while self.tokens[self.posicao]['tipo'] in ['+', '-']:
             self.op_aditivo()
             self.termo()
+
+    def atribuicao(self):
+        self.identificador()
+        self.match('OP_RELACIONAL')
+        self.expressao()
+        self.match(';')
+
+    def comando(self):
+        if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
+            self.atribuicao()
+        elif self.tokens[self.posicao]['tipo'] == 'IF':
+            self.condicional()
+        elif self.tokens[self.posicao]['tipo'] == 'WHILE':
+            self.enquanto()
+        elif self.tokens[self.posicao]['tipo'] == 'RETURN':
+            self.comando_retorno()
+        elif self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE']:
+            self.comando_desvio_incondicional()
+        elif self.tokens[self.posicao]['tipo'] == 'PRINT':
+            self.escrita()
+        else:
+            raise SyntaxError("Erro de sintaxe: Comando inválido")
+
+
 
 
 
