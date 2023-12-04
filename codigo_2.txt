@@ -1,6 +1,3 @@
 programa exemplo1;
-while(x);
-begin
-int a;
-continue
-end
+print(b);
+print('Palavras');
