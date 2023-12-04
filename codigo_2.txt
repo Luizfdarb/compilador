@@ -1,4 +1,5 @@
-programa exemplo 1;
-boolean var;
-int var;
-boolean i;
+programa exemplo1;
+int func var(int x);
+begin
+int x;
+end
