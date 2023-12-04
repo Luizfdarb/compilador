@@ -1,4 +1,6 @@
 from analisador_lexico import *
+import sys
+sys.setrecursionlimit(10000000)  # Ajuste o valor conforme necessário
 
 class AnalisadorSintatico:
     def __init__(self, tokens):
@@ -21,18 +23,23 @@ class AnalisadorSintatico:
     def identificador(self):
         if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
             self.avancar()
+            return
         else:
             raise SyntaxError(f"Erro de sintaxe: Identificador inválido \"{self.tokens[self.posicao]['tipo']}\" na linha {self.tokens[self.posicao]['linha']}")
 
     def match(self, terminal):
         if self.tokens[self.posicao]['tipo'] == terminal:
             self.avancar()
+            return
         else:
             raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {self.tokens[self.posicao]['linha']}, mas encontrado {self.tokens[self.posicao]['tipo']}")
 
     def bloco(self):
         while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
-            self.declaracao_variaveis()
+            if self.tokens[self.posicao + 1]['tipo'] == 'FUNC':
+                self.declaracao_funcao()
+            else:
+                self.declaracao_variaveis()
         # while self.tokens[self.index]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE', 'PRINT']:
         #     self.comando()
 
@@ -44,25 +51,61 @@ class AnalisadorSintatico:
     def tipo(self):
         if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             self.avancar()
+            return
         else:
             raise SyntaxError(f"Erro de sintaxe: Tipo inválido na linha {self.tokens[self.posicao]['linha']}")
 
+
     def declaracao_funcao(self):
-        self.match('FUNC')
         self.tipo()
+        self.match('FUNC')
         self.identificador()
         self.match('(')
-        if self.tokens[self.index]['tipo'] in ['INT', 'BOOLEAN']:
+        if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             self.parametro()
         self.match(')')
+        self.match(';')
         self.bloco_funcao()
+
+    def parametro(self):
+        self.tipo()
+        self.identificador()
+        while self.tokens[self.posicao]['tipo'] == ',':
+            self.avancar()
+            self.tipo()
+            self.identificador()
 
     def avancar(self):
         if self.posicao < len(self.tokens) - 1:
             self.posicao += 1
+            return
         else:
             raise SyntaxError("Compilado")
 
+    def bloco_funcao(self):
+        if self.tokens[self.posicao]['tipo'] == 'BEGIN':
+            self.avancar()
+            self.bloco()
+            if self.tokens[self.posicao]['tipo'] == 'RETURN':
+                self.avancar()
+                self.expressao()
+            self.match('END')
+        else:
+            raise SyntaxError("Erro de sintaxe: Bloco de função mal formado")
+
+    def expressao(self):
+        self.expressao_simples()
+        if self.tokens[self.posicao]['tipo'] in ['==', '!=', '>', '>=', '<', '<=']:
+            self.op_relacional()
+            self.expressao_simples()
+
+    def expressao_simples(self):
+        if self.tokens[self.posicao]['tipo'] in ['+', '-']:
+            self.op_aditivo()
+        self.termo()
+        while self.tokens[self.posicao]['tipo'] in ['+', '-']:
+            self.op_aditivo()
+            self.termo()
 
 
 
@@ -75,6 +118,9 @@ programa_exemplo = AnalisadorLexico(codigo)
 # Obtém os tokens do programa
 tokens_encontrados = programa_exemplo.carregar_tokens()
 
+# #Exibe os tokens encontrados
+for token in tokens_encontrados:
+    print(token)
 
 # Crie uma instância do analisador sintático e realize a análise
 analisador = AnalisadorSintatico(tokens_encontrados)
