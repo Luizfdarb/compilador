@@ -1,6 +1,4 @@
 from analisador_lexico import *
-import sys
-sys.setrecursionlimit(10000000)  # Ajuste o valor conforme necessário
 
 class AnalisadorSintatico:
     def __init__(self, tokens):
@@ -100,9 +98,12 @@ class AnalisadorSintatico:
             raise SyntaxError("Erro de sintaxe: Bloco de função mal formado")
 
     def expressao(self):
-        self.expressao_simples()
-        if self.tokens[self.posicao]['tipo'] in ['==', '!=', '>', '>=', '<', '<=']:
+        self.identificador()
+        if self.tokens[self.posicao]['valor'] in ['==', '!=', '>', '>=', '<', '<=']:
             self.op_relacional()
+            if self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
+                self.expressao_simples()
+        elif self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
             self.expressao_simples()
 
     def expressao_simples(self):
@@ -146,7 +147,7 @@ class AnalisadorSintatico:
 
     def termo(self):
         self.fator()
-        while self.tokens[self.posicao]['tipo'] in ['*', '/']:
+        while self.tokens[self.posicao]['valor'] in ['*', '/']:
             self.op_multiplicativo()
             self.fator()
 
@@ -208,6 +209,12 @@ class AnalisadorSintatico:
         self.match('BEGIN')
         self.bloco()
         self.match('END')
+
+    def op_relacional(self):
+        if self.tokens[self.posicao]['valor'] in ['==', '!=', '>', '>=', '<', '<=']:
+            self.avancar()
+        else:
+            raise SyntaxError("Erro de sintaxe: Operador relacional inválido")
 
 
 
