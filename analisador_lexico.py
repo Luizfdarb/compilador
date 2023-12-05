@@ -151,7 +151,7 @@ class AnalisadorLexico:
                 self.tokens.append({'tipo': char, 'valor': char, 'linha': linha})
                 self.indice += 1
 
-        self.tokens.append({'tipo': 'FIM', 'valor': '$', 'linha': 0})
+        #self.tokens.append({'tipo': 'FIM', 'valor': '$', 'linha': 0})
 
         # Retorna a lista de tokens encontrados
         return self.tokens

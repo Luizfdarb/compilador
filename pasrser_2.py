@@ -21,20 +21,17 @@ class AnalisadorSintatico:
     def identificador(self):
         if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
             self.avancar()
+            return
         else:
             raise SyntaxError(f"Erro de sintaxe: Identificador inválido \"{self.tokens[self.posicao]['tipo']}\" na linha {self.tokens[self.posicao]['linha']}")
 
     def match(self, terminal):
         if self.tokens[self.posicao]['tipo'] == terminal:
             self.avancar()
-        elif self.tokens[self.posicao]['tipo'] == 'FIM':
-            raise SyntaxError(
-                f"Erro de sintaxe: Esperado {terminal}, código incompleto na linha {self.tokens[self.posicao]['linha']}")
         else:
             raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {self.tokens[self.posicao]['linha']}, mas encontrado {self.tokens[self.posicao]['tipo']}")
 
     def bloco(self):
-
         # Verifica se o bloco está varizo
         if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
             raise SyntaxError(
@@ -56,6 +53,7 @@ class AnalisadorSintatico:
     def tipo(self):
         if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             self.avancar()
+            return
         else:
             raise SyntaxError(f"Erro de sintaxe: Tipo inválido na linha {self.tokens[self.posicao]['linha']}")
 
@@ -82,6 +80,7 @@ class AnalisadorSintatico:
     def avancar(self):
         if self.posicao < len(self.tokens) - 1:
             self.posicao += 1
+            return
         else:
             raise SyntaxError("Compilado")
 
@@ -102,11 +101,11 @@ class AnalisadorSintatico:
             self.op_relacional()
             if self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
                 self.expressao_simples()
-        elif self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
+        elif self.tokens[self.posicao]['valor'] in ['+', '-']:
             self.expressao_simples()
 
     def expressao_simples(self):
-        if self.tokens[self.posicao]['tipo'] in ['+', '-']:
+        if self.tokens[self.posicao]['valor'] in ['+', '-']:
             self.op_aditivo()
         self.termo()
         while self.tokens[self.posicao]['tipo'] in ['+', '-']:
@@ -116,7 +115,11 @@ class AnalisadorSintatico:
     def atribuicao(self):
         self.identificador()
         self.match('OP_RELACIONAL')
-        self.expressao()
+        if self.tokens[self.posicao]['tipo'] == 'NUMERO':
+            self.match('NUMERO')
+            self.expressao()
+        elif self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
+            self.expressao()
         self.match(';')
 
     def comando(self):
@@ -214,6 +217,17 @@ class AnalisadorSintatico:
             self.avancar()
         else:
             raise SyntaxError("Erro de sintaxe: Operador relacional inválido")
+
+    def op_aditivo(self):
+        if self.tokens[self.posicao]['valor'] in ['+', '-']:
+            self.avancar()
+        else:
+            raise SyntaxError("Erro de sintaxe: Operador aditivo inválido")
+
+    def comando_retorno(self):
+        self.match('RETURN')
+        self.expressao()
+        self.match(';')
 
 
 
