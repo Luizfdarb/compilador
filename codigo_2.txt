@@ -1,7 +1,2 @@
 programa exemplo;
-int func acao(int a, int b);
-begin
-int b;
-a = a + 1;
-return a;
-end
+acao(int a);
