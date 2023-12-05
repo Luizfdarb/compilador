@@ -240,7 +240,7 @@ class AnalisadorSintatico:
             self.parametro()
         self.match(')')
         self.match(';')
-        self.bloco_funcao()
+
 
 
 
