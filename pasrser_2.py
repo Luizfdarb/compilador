@@ -21,14 +21,15 @@ class AnalisadorSintatico:
     def identificador(self):
         if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
             self.avancar()
-            return
         else:
             raise SyntaxError(f"Erro de sintaxe: Identificador inválido \"{self.tokens[self.posicao]['tipo']}\" na linha {self.tokens[self.posicao]['linha']}")
 
     def match(self, terminal):
         if self.tokens[self.posicao]['tipo'] == terminal:
             self.avancar()
-            return
+        elif self.tokens[self.posicao]['tipo'] == 'FIM':
+            raise SyntaxError(
+                f"Erro de sintaxe: Esperado {terminal}, código incompleto na linha {self.tokens[self.posicao]['linha']}")
         else:
             raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {self.tokens[self.posicao]['linha']}, mas encontrado {self.tokens[self.posicao]['tipo']}")
 
@@ -55,7 +56,6 @@ class AnalisadorSintatico:
     def tipo(self):
         if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             self.avancar()
-            return
         else:
             raise SyntaxError(f"Erro de sintaxe: Tipo inválido na linha {self.tokens[self.posicao]['linha']}")
 
@@ -82,7 +82,6 @@ class AnalisadorSintatico:
     def avancar(self):
         if self.posicao < len(self.tokens) - 1:
             self.posicao += 1
-            return
         else:
             raise SyntaxError("Compilado")
 
