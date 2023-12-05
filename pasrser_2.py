@@ -224,6 +224,11 @@ class AnalisadorSintatico:
         else:
             raise SyntaxError("Erro de sintaxe: Operador aditivo inválido")
 
+    def comando_retorno(self):
+        self.match('RETURN')
+        self.expressao()
+        self.match(';')
+
 
 
 # Nome do arquivo contendo o código
