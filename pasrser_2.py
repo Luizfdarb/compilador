@@ -124,7 +124,10 @@ class AnalisadorSintatico:
 
     def comando(self):
         if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
-            self.atribuicao()
+            if self.tokens[self.posicao + 1]['valor'] == '(':
+                self.chamada_procedimento_funcao()
+            else:
+                self.atribuicao()
         elif self.tokens[self.posicao]['tipo'] == 'IF':
             self.condicional()
         elif self.tokens[self.posicao]['tipo'] == 'WHILE':
@@ -228,6 +231,17 @@ class AnalisadorSintatico:
         self.match('RETURN')
         self.expressao()
         self.match(';')
+
+
+    def chamada_procedimento_funcao(self):
+        self.identificador()
+        self.match('(')
+        if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
+            self.parametro()
+        self.match(')')
+        self.match(';')
+
+
 
 
 
