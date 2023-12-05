@@ -1,3 +1,14 @@
 programa exemplo1;
-print(b);
-print('Palavras');
+if(a);
+begin
+    int a;
+    if(a);
+    begin
+         int b;
+    end
+end
+else;
+begin
+    int a;
+end
+

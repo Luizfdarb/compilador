@@ -181,7 +181,7 @@ class AnalisadorSintatico:
     def escrita(self):
         self.match('PRINT')
         self.match('(')
-        if self.tokens[self.posicao]['tipo'] == '\'' or self.tokens[self.posicao]['tipo'] == '\"':
+        if self.tokens[self.posicao]['tipo'] == '\'':
             self.match('\'')
             self.identificador()
             self.match('\'')
@@ -189,6 +189,25 @@ class AnalisadorSintatico:
             self.expressao()
         self.match(')')
         self.match(';')
+
+    def condicional(self):
+        self.match('IF')
+        self.match('(')
+        self.expressao()
+        self.match(')')
+        self.match(';')
+        self.bloco_condicional()
+        if(self.tokens[self.posicao]['tipo'] == 'ELSE'):
+            self.avancar()
+            self.match(';')
+            self.bloco_condicional()
+
+
+
+    def bloco_condicional(self):
+        self.match('BEGIN')
+        self.bloco()
+        self.match('END')
 
 
 
