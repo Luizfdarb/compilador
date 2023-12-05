@@ -101,7 +101,7 @@ class AnalisadorSintatico:
             self.op_relacional()
             if self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
                 self.expressao_simples()
-        elif self.tokens[self.posicao]['valor'] in ['+', '-']:
+        elif self.tokens[self.posicao]['valor'] in ['+', '-', '*', '/']:
             self.expressao_simples()
 
     def expressao_simples(self):
@@ -151,7 +151,11 @@ class AnalisadorSintatico:
 
 
     def termo(self):
-        self.fator()
+        if self.tokens[self.posicao]['valor'] in ['*', '/']:
+            self.op_multiplicativo()
+            self.fator()
+        else:
+            self.fator()
         while self.tokens[self.posicao]['valor'] in ['*', '/']:
             self.op_multiplicativo()
             self.fator()
@@ -240,6 +244,12 @@ class AnalisadorSintatico:
             self.parametro()
         self.match(')')
         self.match(';')
+
+    def op_multiplicativo(self):
+        if self.tokens[self.posicao]['valor'] in ['*', '/']:
+            self.avancar()
+        else:
+            raise SyntaxError("Erro de sintaxe: Operador multiplicativo inválido")
 
 
 

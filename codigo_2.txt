@@ -1,2 +1,2 @@
 programa exemplo;
-acao(int a);
+a = a / 1;
