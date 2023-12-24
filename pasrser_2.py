@@ -96,6 +96,7 @@ class AnalisadorSintatico:
             raise SyntaxError("Erro de sintaxe: Bloco de função mal formado")
 
     def expressao(self):
+        self.expressao_simples()
         if self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
             self.identificador()
         elif self.tokens[self.posicao]['valor'] in ['==', '!=', '>', '>=', '<', '<=']:
@@ -118,8 +119,12 @@ class AnalisadorSintatico:
         self.match('OP_RELACIONAL')
         if self.tokens[self.posicao]['tipo'] == 'NUMERO':
             self.match('NUMERO')
+            self.expressao()
         elif self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
             self.identificador()
+            self.expressao()
+        else:
+            self.expressao()
         self.match(';')
 
     def comando(self):
@@ -175,7 +180,7 @@ class AnalisadorSintatico:
             self.avancar()
             self.fator()
         else:
-            raise SyntaxError(f"Erro de sintaxe: Fator {self.tokens[self.posicao]['tipo']} inválido ")
+            raise SyntaxError(f"Erro de sintaxe: Fator {self.tokens[self.posicao]['tipo']} inválido na linha {self.tokens[self.posicao]['linha']}")
 
     def bloco_enquanto(self):
         self.match('BEGIN')
