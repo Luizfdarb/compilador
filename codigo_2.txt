@@ -1,2 +1,5 @@
 programa exemplo;
-print(111111111111111111111);
+a = a;
+a = 1;
+a = aamo;
+a = 21231;

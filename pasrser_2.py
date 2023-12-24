@@ -96,8 +96,9 @@ class AnalisadorSintatico:
             raise SyntaxError("Erro de sintaxe: Bloco de função mal formado")
 
     def expressao(self):
-        self.identificador()
-        if self.tokens[self.posicao]['valor'] in ['==', '!=', '>', '>=', '<', '<=']:
+        if self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
+            self.identificador()
+        elif self.tokens[self.posicao]['valor'] in ['==', '!=', '>', '>=', '<', '<=']:
             self.op_relacional()
             if self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
                 self.expressao_simples()
@@ -117,9 +118,8 @@ class AnalisadorSintatico:
         self.match('OP_RELACIONAL')
         if self.tokens[self.posicao]['tipo'] == 'NUMERO':
             self.match('NUMERO')
-            self.expressao()
         elif self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
-            self.expressao()
+            self.identificador()
         self.match(';')
 
     def comando(self):
