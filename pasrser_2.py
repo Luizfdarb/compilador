@@ -119,10 +119,12 @@ class AnalisadorSintatico:
         self.match('OP_RELACIONAL')
         if self.tokens[self.posicao]['tipo'] == 'NUMERO':
             self.match('NUMERO')
-            self.expressao()
+            if self.tokens[self.posicao]['tipo'] != ';':
+                self.expressao()
         elif self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
             self.identificador()
-            self.expressao()
+            if self.tokens[self.posicao]['tipo'] != ';':
+                self.expressao()
         else:
             self.expressao()
         self.match(';')
