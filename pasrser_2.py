@@ -96,8 +96,10 @@ class AnalisadorSintatico:
             raise SyntaxError("Erro de sintaxe: Bloco de função mal formado")
 
     def expressao(self):
-        self.identificador()
-        if self.tokens[self.posicao]['valor'] in ['==', '!=', '>', '>=', '<', '<=']:
+        self.expressao_simples()
+        if self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
+            self.identificador()
+        elif self.tokens[self.posicao]['valor'] in ['==', '!=', '>', '>=', '<', '<=']:
             self.op_relacional()
             if self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR']:
                 self.expressao_simples()
@@ -117,8 +119,13 @@ class AnalisadorSintatico:
         self.match('OP_RELACIONAL')
         if self.tokens[self.posicao]['tipo'] == 'NUMERO':
             self.match('NUMERO')
-            self.expressao()
+            if self.tokens[self.posicao]['tipo'] != ';':
+                self.expressao()
         elif self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
+            self.identificador()
+            if self.tokens[self.posicao]['tipo'] != ';':
+                self.expressao()
+        else:
             self.expressao()
         self.match(';')
 
@@ -175,7 +182,7 @@ class AnalisadorSintatico:
             self.avancar()
             self.fator()
         else:
-            raise SyntaxError(f"Erro de sintaxe: Fator {self.tokens[self.posicao]['tipo']} inválido ")
+            raise SyntaxError(f"Erro de sintaxe: Fator {self.tokens[self.posicao]['tipo']} inválido na linha {self.tokens[self.posicao]['linha']}")
 
     def bloco_enquanto(self):
         self.match('BEGIN')
@@ -191,10 +198,10 @@ class AnalisadorSintatico:
     def escrita(self):
         self.match('PRINT')
         self.match('(')
-        if self.tokens[self.posicao]['tipo'] == '\'':
-            self.match('\'')
-            self.identificador()
-            self.match('\'')
+        if self.tokens[self.posicao]['tipo'] == 'NUMERO':
+            self.fator()
+            self.match(')')
+            self.match(';')
         else:
             self.expressao()
         self.match(')')
