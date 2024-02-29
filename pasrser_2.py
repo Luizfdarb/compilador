@@ -189,6 +189,12 @@ class AnalisadorSintatico:
 
     def bloco_enquanto(self):
         self.match('BEGIN')
+        if self.tokens[self.posicao]['tipo'] in ['BREAK']:
+            while self.tokens[self.posicao]['tipo'] != ['END']:
+                self.avancar()
+        elif self.tokens[self.posicao]['tipo'] in ['CONTINUE']:
+            self.avancar()
+            self.bloco()
         self.bloco()
         self.match('END')
 
