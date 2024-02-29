@@ -1,0 +1,7 @@
+programa exemplo;
+chamada_procedimento(int a);
+chamada_procedimento(int a, int b);
+chamada_procedimento(int a, int b, int c);
+
+
+

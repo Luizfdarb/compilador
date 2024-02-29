@@ -69,6 +69,9 @@ class AnalisadorSintatico:
         self.match(';')
         self.bloco_funcao()
 
+    def declaracao_procedimento(self):
+        self.bloco_procedimento()
+
     def parametro(self):
         self.tipo()
         self.identificador()
@@ -251,6 +254,8 @@ class AnalisadorSintatico:
             self.parametro()
         self.match(')')
         self.match(';')
+        if self.tokens[self.posicao]['tipo'] in ['BEGIN']:
+            self.declaracao_procedimento()
 
     def op_multiplicativo(self):
         if self.tokens[self.posicao]['valor'] in ['*', '/']:
@@ -259,11 +264,26 @@ class AnalisadorSintatico:
             raise SyntaxError("Erro de sintaxe: Operador multiplicativo inválido")
 
 
+    def bloco_procedimento(self):
+        if self.tokens[self.posicao]['tipo'] == 'BEGIN':
+            self.avancar()
+            self.bloco()
+            self.match('END')
+        else:
+            raise SyntaxError("Erro de sintaxe: Bloco de procedimento mal formado")
 
-
+vetor = ['atribuicao',
+         'chamada_funcao',
+         'chamada_procedimento',
+         'declaracao_procedimento',
+         'declaracao_funcao',
+         'declaracao_variavel',
+         'enquanto',
+         'operacoes'
+         ]
 
 # Nome do arquivo contendo o código
-codigo = "codigo_2.txt"
+codigo = "exemplo_codigo/" + vetor[6] + ".txt"
 
 # Carrega o código de um arquivo TXT
 programa_exemplo = AnalisadorLexico(codigo)

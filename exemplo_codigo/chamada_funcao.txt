@@ -1,0 +1,7 @@
+programa exemplo;
+chamada_funcao(int a);
+chamada_funcao(int a, int b);
+chamada_funcao(int a, int b, int c);
+
+
+

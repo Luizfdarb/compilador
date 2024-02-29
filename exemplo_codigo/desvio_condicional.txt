@@ -1,0 +1,12 @@
+programa exemplo;
+if(a < b);
+begin
+int a;
+end
+else;
+begin
+int b;
+end
+
+
+

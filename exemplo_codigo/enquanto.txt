@@ -1,0 +1,10 @@
+programa exemplo;
+while(a > b);
+begin
+int a;
+continue;
+break;
+end
+
+
+

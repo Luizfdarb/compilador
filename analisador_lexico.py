@@ -39,7 +39,7 @@ class AnalisadorLexico:
             # Comentários
             if char == '#':
                 self.indice += 1
-                while self.indice < len(self.codigo) and codigo[self.indice] != '\n':
+                while self.indice < len(self.codigo) and self.codigo[self.indice] != '\n':
                     self.indice += 1
                 continue
 
