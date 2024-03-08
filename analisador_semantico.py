@@ -17,7 +17,6 @@ class AnalisadorSemantico:
                             # Atribuímos ao programa
                             # O que foi passado pelo usuário
                             info['valor'] = self.tokens[1]['valor']
-
                     print("Análise semântica concluída: Estrutura básica do programa está correta.")
                     break
                 else:
@@ -25,7 +24,7 @@ class AnalisadorSemantico:
                     break
             else:
                 print(
-                    "Erro semântico: O programa deve começar com a palavra-chave  seguida por um identificador.")
+                    f"Erro semântico: O programa deve começar com a palavra-chave  seguida por um identificador linha {self.tokens[0]['linha']}.")
                 break
 
     def verifica_declaracao_variavel(self):
@@ -46,22 +45,27 @@ class AnalisadorSemantico:
                         if identificador == atual['valor']:
                             # Atribui o valor INTEIRO a variável
                             info['valor'] = proximo_do_proximo['valor']
-                    print("Análise semântica concluída: Variaveis corretas")
-                    break
+
                 elif proximo_do_proximo['tipo'] == 'IDENTIFICADOR':
                     # Atualiza o valor da tabela de Símbolos
                     for identificador, info in tabela_simbolos.tabela.items():
                         if identificador == atual['valor']:
                             # Atribui o valor INTEIRO a variável
                             info['valor'] = proximo_do_proximo['valor']
-                    print(self.tabela_simbolos)
+
+                elif proximo_do_proximo['tipo'] == 'BOOLEAN':
+                    # Atualiza o valor da tabela de Símbolos
+                    for identificador, info in tabela_simbolos.tabela.items():
+                        if identificador == atual['valor']:
+                            # Atribui o valor INTEIRO a variável
+                            info['valor'] = proximo_do_proximo['valor']
                     print("Análise semântica concluída: Variaveis corretas")
-                    break
+
                 else:
                     print(
                         f"Erro semântico: É esperado uma Variável, INT ou BOOLEAN, foi passado '{proximo_do_proximo['valor']}' na linha  {atual['linha']}")
                     break
-
+        print(tabela_simbolos)
 
     def verifica_tipagem_variavel(self):
 
