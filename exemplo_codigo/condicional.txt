@@ -1,5 +1,8 @@
 programa exemplo;
-if(a < b);
+int a;
+int b;
+
+if(a >= b);
 begin
 int a;
 end

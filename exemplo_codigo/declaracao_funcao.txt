@@ -1,0 +1,14 @@
+programa exemplo;
+int func declaracao_funcao(int a);
+begin
+int a;
+return a;
+end
+
+declaracao_funcao(int a);
+
+
+
+
+
+

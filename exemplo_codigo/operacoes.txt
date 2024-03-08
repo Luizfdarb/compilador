@@ -1,13 +1,11 @@
 programa exemplo;
-a = 1;
-a = 1 + b;
-a = (1 + 1) + a;
-a = 1 + (1 + 1);
-a = a + 1 - b;
-a = a * 1;
-a = 1 / b;
-a = a + 1 + b;
-a = a * 1 * b;
+int b;
+int c;
+
+a = 1 + b + c;
+
+
+
 
 
 

@@ -1,7 +1,7 @@
 from analisador_lexico import *
 
 class AnalisadorSintatico:
-    def __init__(self, tokens):
+    def __init__(self, tokens, codigo):
         self.posicao = 0
         self.codigo = codigo
         self.tokens = tokens
@@ -85,7 +85,7 @@ class AnalisadorSintatico:
             self.posicao += 1
             return
         else:
-            raise SyntaxError("Compilado")
+            raise SyntaxError("Nenhum Erro Sintático")
 
     def bloco_funcao(self):
         if self.tokens[self.posicao]['tipo'] == 'BEGIN':
@@ -128,6 +128,9 @@ class AnalisadorSintatico:
             self.identificador()
             if self.tokens[self.posicao]['tipo'] != ';':
                 self.expressao()
+        elif self.tokens[self.posicao]['tipo'] == 'BOOLEAN':
+            self.match('BOOLEAN')
+            self.match(';')
         else:
             self.expressao()
         self.match(';')
@@ -278,29 +281,31 @@ class AnalisadorSintatico:
         else:
             raise SyntaxError("Erro de sintaxe: Bloco de procedimento mal formado")
 
-vetor = ['atribuicao',
-         'chamada_funcao',
-         'chamada_procedimento',
-         'declaracao_procedimento',
-         'declaracao_funcao',
-         'declaracao_variavel',
-         'enquanto',
-         'operacoes'
-         ]
-
-# Nome do arquivo contendo o código
-codigo = "exemplo_codigo/" + vetor[6] + ".txt"
-
-# Carrega o código de um arquivo TXT
-programa_exemplo = AnalisadorLexico(codigo)
-
-# Obtém os tokens do programa
-tokens_encontrados = programa_exemplo.carregar_tokens()
-
-# #Exibe os tokens encontrados
-for token in tokens_encontrados:
-    print(token)
-
-# Crie uma instância do analisador sintático e realize a análise
-analisador = AnalisadorSintatico(tokens_encontrados)
-analisador.analise_sintatica()
+# vetor = ['atribuicao',
+#          'chamada_funcao',
+#          'chamada_procedimento',
+#          'declaracao_procedimento',
+#          'declaracao_funcao',
+#          'declaracao_variavel',
+#          'enquanto',
+#          'escrita',
+#          'operacoes'
+#          ]
+#
+# # Nome do arquivo contendo o código
+# codigo = "exemplo_codigo/" + vetor[7] + ".txt"
+#
+# # Carrega o código de um arquivo TXT
+# programa_exemplo = AnalisadorLexico(codigo)
+#
+# # Obtém os tokens do programa
+# tokens_encontrados,_ = programa_exemplo.carregar_tokens()
+#
+# # Obtém a tabela de Símbolos
+# _,tabela_simbolos = programa_exemplo.carregar_tokens()
+#
+# print(tabela_simbolos)
+#
+# # Crie uma instância do analisador sintático e realize a análise
+# analisador = AnalisadorSintatico(tokens_encontrados)
+# analisador.analise_sintatica()

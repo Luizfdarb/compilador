@@ -1,3 +1,5 @@
+from tabela_simbolos import *
+
 class AnalisadorLexico:
     def __init__(self, arquivo):
         self.arquivo = arquivo
@@ -5,6 +7,7 @@ class AnalisadorLexico:
         self.linhas = self.carregar_linhas()
         self.indice = 0
         self.tokens = []
+        self.tabela_simbolos = TabelaSimbolos()
 
     def carregar_codigo(self):
         # Lê o conteúdo do arquivo TXT que contém o código
@@ -53,7 +56,7 @@ class AnalisadorLexico:
                     self.indice += 1
 
                 # Verifica se é uma palavra-chave ou identificador e adiciona ao token
-                palavras_chave = ['programa', 'int', 'boolean', 'func', 'begin', 'end',
+                palavras_chave = ['programa', 'int', 'boolean', 'func', 'begin', 'end', 'true', 'false',
                                   'return', 'if', 'else', 'while', 'break', 'continue', 'print']
                 if identificador in palavras_chave:
                     for i, string in enumerate(self.linhas):
@@ -61,7 +64,12 @@ class AnalisadorLexico:
                             linha = i + 1
                             self.linhas[i] = string.replace(identificador, '', 1)
                             break
-                    self.tokens.append(
+
+                    if identificador == 'true' or identificador == 'false':
+                        self.tokens.append(
+                            {'tipo': 'BOOLEAN', 'valor': identificador, 'linha': linha})
+                    else:
+                        self.tokens.append(
                         {'tipo': identificador.upper(), 'valor': identificador, 'linha': linha})
                 else:
                     for i, string in enumerate(self.linhas):
@@ -151,27 +159,35 @@ class AnalisadorLexico:
                 self.tokens.append({'tipo': char, 'valor': char, 'linha': linha})
                 self.indice += 1
 
-        #self.tokens.append({'tipo': 'FIM', 'valor': '$', 'linha': 0})
+
+        # Imprimindo os valores do dicionário
+        for token in self.tokens:
+
+            # Verifica se é uma palavra-chave ou identificador e adiciona ao token
+            palavras_reservadas = ['programa', 'int', 'func', 'begin', 'end',
+                              'return', 'if', 'else', 'while', 'break', 'continue', 'print']
+
+            # Verifica se é um booleano
+            tipos_boolean = ['true', 'false']
+
+            # Adicionando a tabela de Símbolos
+            if token['tipo'].lower() in palavras_reservadas:
+                self.tabela_simbolos.adicionar_token(token['valor'], 'PALAVRA_CHAVE', token['linha'])
+            # Adicionando tokens à tabela
+            elif token['tipo'] == 'IDENTIFICADOR':
+                self.tabela_simbolos.adicionar_token(token['valor'], token['tipo'], token['linha'])
+            elif token['tipo'] == 'NUMERO':
+                self.tabela_simbolos.adicionar_token(token['valor'], 'INTEIRO', token['linha'])
+            elif token['tipo'] == 'OP_RELACIONAL':
+                self.tabela_simbolos.adicionar_token(token['valor'], 'OP_RELACIONAL', token['linha'])
+            elif token['tipo'] == 'OP_ARITMETICO':
+                self.tabela_simbolos.adicionar_token(token['valor'], 'OP_ARITMETICO', token['linha'])
+            elif token['tipo'] == 'STRING':
+                self.tabela_simbolos.adicionar_token(token['valor'], 'STRING', token['linha'])
+            elif token['tipo'] in ';()':
+                self.tabela_simbolos.adicionar_token(token['valor'], 'DELIMITADOR', token['linha'])
+            elif token['tipo'] == 'BOOLEAN':
+                self.tabela_simbolos.adicionar_token(token['valor'], 'BOOLEAN', token['linha'])
 
         # Retorna a lista de tokens encontrados
-        return self.tokens
-
-
-
-
-
-
-# # Nome do arquivo contendo o código
-# codigo = 'codigo_2.txt'
-#
-# # Carrega o código de um arquivo TXT
-# programa_exemplo = AnalisadorLexico(codigo)
-#
-# # Obtém os tokens do programa
-# tokens_encontrados = programa_exemplo.carregar_tokens()
-#
-# print(programa_exemplo.carregar_linhas())
-# #
-# # #Exibe os tokens encontrados
-# for token in tokens_encontrados:
-#     print(token)
+        return self.tokens, self.tabela_simbolos
