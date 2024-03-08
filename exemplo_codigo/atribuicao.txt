@@ -1,0 +1,8 @@
+programa exemplo;
+int b;
+a = b;
+c = true;
+
+
+
+

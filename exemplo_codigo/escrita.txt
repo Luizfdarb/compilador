@@ -1,0 +1,7 @@
+programa exemplo;
+int a;
+print(a);
+
+
+
+

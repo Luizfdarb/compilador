@@ -1,0 +1,9 @@
+programa exemplo;
+declaracao_procedimento(int a);
+begin
+int a;
+end
+
+
+
+

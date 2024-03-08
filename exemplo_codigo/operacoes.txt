@@ -1,0 +1,11 @@
+programa exemplo;
+int b;
+int c;
+
+a = 1 + b + c;
+
+
+
+
+
+
