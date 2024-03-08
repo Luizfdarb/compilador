@@ -32,7 +32,7 @@ class AnalisadorSintatico:
             raise SyntaxError(f"Erro de sintaxe: Esperado {terminal} na linha {self.tokens[self.posicao]['linha']}, mas encontrado {self.tokens[self.posicao]['tipo']}")
 
     def bloco(self):
-        # Verifica se o bloco está varizo
+        # Verifica se o bloco está vazio
         if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
             raise SyntaxError(
                 f"Erro de sintaxe: Bloco vazio {self.tokens[self.posicao]['linha']}")
@@ -84,8 +84,10 @@ class AnalisadorSintatico:
         if self.posicao < len(self.tokens) - 1:
             self.posicao += 1
             return
-        else:
+        elif self.posicao == len(self.tokens) - 1 and self.tokens[self.posicao]['tipo'] == 'END' or self.tokens[self.posicao]['tipo'] == ';':
             raise SyntaxError("Nenhum Erro Sintático")
+        else:
+            raise SyntaxError(f"Erro Sintático: Faltando completar o código na linha {self.tokens[self.posicao]['linha']}")
 
     def bloco_funcao(self):
         if self.tokens[self.posicao]['tipo'] == 'BEGIN':
@@ -130,14 +132,13 @@ class AnalisadorSintatico:
                 self.expressao()
         elif self.tokens[self.posicao]['tipo'] == 'BOOLEAN':
             self.match('BOOLEAN')
-            self.match(';')
         else:
             self.expressao()
         self.match(';')
 
     def comando(self):
         if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
-            if self.tokens[self.posicao + 1]['valor'] == '(':
+            if self.posicao + 1 > len(self.tokens) and self.tokens[self.posicao + 1]['valor'] == '(':
                 self.chamada_procedimento_funcao()
             else:
                 self.atribuicao()

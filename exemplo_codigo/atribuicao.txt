@@ -2,6 +2,9 @@ programa exemplo;
 int b;
 a = b;
 c = true;
+a = 1;
+b = false;
+c = b;
 
 
 
