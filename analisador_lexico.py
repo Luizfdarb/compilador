@@ -1,5 +1,4 @@
-from tabela_simbolos import *
-
+from tabela_simbolos import TabelaSimbolos
 class AnalisadorLexico:
     def __init__(self, arquivo):
         self.arquivo = arquivo
@@ -19,13 +18,7 @@ class AnalisadorLexico:
         linhas_codigo = []
         # Ler o txt com o código
         with open(self.arquivo, 'r') as arquivo:
-            linha = arquivo.read()
-            # Remove os espaços do código
-            linhas_codigo = linha.replace(' ', '')
-
-            # Salva as linhas de código
-            linhas_codigo = linhas_codigo.split()
-
+            linhas_codigo = arquivo.readlines()  # Read lines instead of reading the whole file
         return linhas_codigo
 
     def carregar_tokens(self):
@@ -59,10 +52,10 @@ class AnalisadorLexico:
                 palavras_chave = ['programa', 'int', 'boolean', 'func', 'begin', 'end', 'true', 'false',
                                   'return', 'if', 'else', 'while', 'break', 'continue', 'print']
                 if identificador in palavras_chave:
-                    for i, string in enumerate(self.linhas):
-                        if identificador in string:
+                    for i, linha_codigo in enumerate(self.linhas):
+                        if identificador in linha_codigo:
                             linha = i + 1
-                            self.linhas[i] = string.replace(identificador, '', 1)
+                            self.linhas[i] = linha_codigo.replace(identificador, '', 1)
                             break
 
                     if identificador == 'true' or identificador == 'false':
@@ -72,10 +65,10 @@ class AnalisadorLexico:
                         self.tokens.append(
                         {'tipo': identificador.upper(), 'valor': identificador, 'linha': linha})
                 else:
-                    for i, string in enumerate(self.linhas):
-                        if identificador in string:
+                    for i, linha_codigo in enumerate(self.linhas):
+                        if identificador in linha_codigo:
                             linha = i + 1
-                            self.linhas[i] = string.replace(identificador, '', 1)
+                            self.linhas[i] = linha_codigo.replace(identificador, '', 1)
                             break
                     self.tokens.append(
                         {'tipo': 'IDENTIFICADOR', 'valor': identificador, 'linha': linha})
@@ -89,10 +82,10 @@ class AnalisadorLexico:
                     numero += self.codigo[self.indice]
                     self.indice += 1
                 # Percorre o vetor de linhas
-                for i, string in enumerate(self.linhas):
-                    if char in string:
+                for i, linha_codigo in enumerate(self.linhas):
+                    if char in linha_codigo:
                         linha = i + 1
-                        self.linhas[i] = string.replace(char, '', 1)
+                        self.linhas[i] = linha_codigo.replace(char, '', 1)
                         break
                 # Adiciona o número ao token
                 self.tokens.append({'tipo': 'NUMERO', 'valor': numero, 'linha': linha})
@@ -107,10 +100,10 @@ class AnalisadorLexico:
                     self.indice += 1
 
                 # Percorre o vetor de linhas
-                for i, string in enumerate(self.linhas):
-                    if operador_relacional in string:
+                for i, linha_codigo in enumerate(self.linhas):
+                    if operador_relacional in linha_codigo:
                         linha = i + 1
-                        self.linhas[i] = string.replace(char, '', 1)
+                        self.linhas[i] = linha_codigo.replace(char, '', 1)
                         break
                 # Adiciona o operador ao token
                 self.tokens.append({'tipo': 'OP_RELACIONAL',
@@ -119,10 +112,10 @@ class AnalisadorLexico:
             # Operadores aritméticos
             elif char in "+-*/":
                 # Percorre o vetor de linhas
-                for i, string in enumerate(self.linhas):
-                    if char in string:
+                for i, linha_codigo in enumerate(self.linhas):
+                    if char in linha_codigo:
                         linha = i + 1
-                        self.linhas[i] = string.replace(char, '', 1)
+                        self.linhas[i] = linha_codigo.replace(char, '', 1)
                         break
                 # Adiciona o operador aritmético ao token
                 self.tokens.append({'tipo': 'OP_ARITMETICO', 'valor': char, 'linha': linha})
@@ -133,27 +126,27 @@ class AnalisadorLexico:
                 self.indice += 1
                 vazio = ''
                 while self.indice < len(self.codigo) and self.codigo[self.indice] != '"':
-                    string += self.codigo[self.indice]
+                    vazio += self.codigo[self.indice]
                     self.indice += 1
                 if self.indice < len(self.codigo) and self.codigo[self.indice] == '"':
                     self.indice += 1
                     # Percorre o vetor de linhas
-                    for i, string in enumerate(self.linhas):
-                        if vazio in string:
+                    for i, linha_codigo in enumerate(self.linhas):
+                        if vazio in linha_codigo:
                             linha = i + 1
-                            self.linhas[i] = string.replace(char, '', 1)
+                            self.linhas[i] = linha_codigo.replace(char, '', 1)
                             break
-                    self.tokens.append({'tipo': 'STRING', 'valor': string, 'linha': linha})
+                    self.tokens.append({'tipo': 'STRING', 'valor': vazio, 'linha': linha})
                 else:
                     # Erro: String não fechada
                     print("Erro: String não fechada")
 
             # Outros caracteres especiais
             else:
-                for i, string in enumerate(self.linhas):
-                    if char in string:
+                for i, linha_codigo in enumerate(self.linhas):
+                    if char in linha_codigo:
                         linha = i + 1
-                        self.linhas[i] = string.replace(char, '', 1)
+                        self.linhas[i] = linha_codigo.replace(char, '', 1)
                         break
                 # Adiciona o caractere especial ao token
                 self.tokens.append({'tipo': char, 'valor': char, 'linha': linha})
