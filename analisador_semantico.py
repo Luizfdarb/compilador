@@ -359,21 +359,9 @@ class AnalisadorSemantico:
 
 
 
-vetor = ['atribuicao',
-         'chamada_funcao',
-         'chamada_procedimento',
-         'declaracao_funcao',
-         'declaracao_procedimento',
-         'condicional',
-         'declaracao_funcao',
-         'declaracao_variavel',
-         'enquanto',
-         'escrita',
-         'operacoes'
-         ]
 
 # Carrega arquivo
-codigo = "exemplo_codigo/" + vetor[0]+ ".txt"
+codigo = "exemplo_codigo/atribuicao.txt"
 
 # Carrega o código de um arquivo TXT
 programa_exemplo = AnalisadorLexico(codigo)
@@ -385,7 +373,7 @@ tokens_encontrados, tabela_simbolos = programa_exemplo.carregar_tokens()
 for token in tokens_encontrados:
     print(token)
 
-print(tabela_simbolos)
+#print(tabela_simbolos)
 
 
 # Crie uma instância do analisador sintático e realize a análise

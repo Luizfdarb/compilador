@@ -1,5 +1,4 @@
 from analisador_lexico import *
-from tabela_simbolos import TabelaSimbolos
 
 class AnalisadorSintatico:
     def __init__(self, tokens, codigo):
@@ -10,12 +9,8 @@ class AnalisadorSintatico:
     def analise_sintatica(self):
         try:
             self.programa()
-            print("Análise sintática concluída sem erros.")
-        except SyntaxError as e:
-            print(f"Erro de sintaxe: {e}")
         except Exception as e:
-            print(f"Erro desconhecido: {e}")
-
+            print(f"{e}")
 
     def programa(self):
         self.match('PROGRAMA')
@@ -48,12 +43,16 @@ class AnalisadorSintatico:
                 self.declaracao_variaveis()
         while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE', 'PRINT']:
             self.comando()
+        self.bloco()
 
 
     def declaracao_variaveis(self):
         self.tipo()
-        self.identificador()
-        self.match(';')
+        if self.tokens[self.posicao + 1]['valor'] == ';':
+            self.identificador()
+            self.match(';')
+        else:
+            self.atribuicao()
 
     def tipo(self):
         if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
@@ -117,31 +116,12 @@ class AnalisadorSintatico:
             self.expressao_simples()
 
     def expressao_simples(self):
+        if self.tokens[self.posicao]['valor'] in ['+', '-']:
+            self.op_aditivo()
         self.termo()
         while self.tokens[self.posicao]['tipo'] in ['+', '-']:
-            operador = self.tokens[self.posicao]['valor']
-            self.avancar()
+            self.op_aditivo()
             self.termo()
-            
-            # Check for type compatibility
-            if not self.verificar_compatibilidade_tipos(operador):
-                raise SyntaxError(f"Erro de sintaxe: Tipos incompatíveis na expressão simples na linha {self.tokens[self.posicao]['linha']}")
-
-    def verificar_compatibilidade_tipos(self, operador):
-        if operador in ['+', '-']:
-            tipo_operando_1 = self.tipo_operando(self.tokens[self.posicao - 2]['tipo'])
-            tipo_operando_2 = self.tipo_operando(self.tokens[self.posicao]['tipo'])
-            return tipo_operando_1 == tipo_operando_2
-        # Add more checks for other operators as needed
-        return True
-
-    def tipo_operando(self, tipo):
-        if tipo == 'NUMERO':
-            return 'INT'
-        elif tipo in ['TRUE', 'FALSE']:
-            return 'BOOLEAN'
-        else:
-            return tipo
 
     def atribuicao(self):
         self.identificador()
@@ -306,22 +286,31 @@ class AnalisadorSintatico:
         else:
             raise SyntaxError("Erro de sintaxe: Bloco de procedimento mal formado")
 
-
-codigo = "exemplo_codigo.txt"
-
-# Analisador Léxico
-programa_exemplo = AnalisadorLexico(codigo)
-tokens_encontrados, tabela_simbolos = programa_exemplo.carregar_tokens()
-
-# Imprimindo a lista de tokens
-print("Lista de Tokens:")
-for token in tokens_encontrados:
-    print(token)
-
-# Imprimindo a tabela de símbolos
-print(tabela_simbolos)
-
-print("\n")
-analisador = AnalisadorSintatico(tokens_encontrados, codigo)
-
-analisador.analise_sintatica()
+# vetor = ['atribuicao',
+#          'chamada_funcao',
+#          'chamada_procedimento',
+#          'declaracao_procedimento',
+#          'declaracao_funcao',
+#          'declaracao_variavel',
+#          'enquanto',
+#          'escrita',
+#          'operacoes'
+#          ]
+#
+# # Nome do arquivo contendo o código
+# codigo = "exemplo_codigo/" + vetor[7] + ".txt"
+#
+# # Carrega o código de um arquivo TXT
+# programa_exemplo = AnalisadorLexico(codigo)
+#
+# # Obtém os tokens do programa
+# tokens_encontrados,_ = programa_exemplo.carregar_tokens()
+#
+# # Obtém a tabela de Símbolos
+# _,tabela_simbolos = programa_exemplo.carregar_tokens()
+#
+# print(tabela_simbolos)
+#
+# # Crie uma instância do analisador sintático e realize a análise
+# analisador = AnalisadorSintatico(tokens_encontrados)
+# analisador.analise_sintatica()
