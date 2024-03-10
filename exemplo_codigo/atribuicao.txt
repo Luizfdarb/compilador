@@ -1,10 +1,28 @@
 programa exemplo;
-int b;
-a = b;
-c = true;
+
+int a;
 a = 1;
-b = false;
-c = b;
+int a;
+boolean b;
+a = b;
+
+int x = a;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
