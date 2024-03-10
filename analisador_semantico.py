@@ -85,8 +85,8 @@ class AnalisadorSemantico:
 
 
                 # se depois da variável tiver um '=' e depois for 'IDENTIFICADOR'
-                elif self.tokens[posicao + 1]['valor'] == '=' and self.tokens[posicao + 2]['tipo'] == 'IDENTIFICADOR':
-                    if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo'] or self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == 'IDENTIFICADOR':
+                elif self.tokens[posicao + 1]['valor'] == '=' and self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo'] == 'INT':
+                    if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo']:
                        # Salva o tipo 'IDENTIFICADOR' na variavel
                         self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo']
                         # Salva o valor do 'IDENTIFICADOR' na tabela na variavel
@@ -96,6 +96,25 @@ class AnalisadorSemantico:
                     else:
                         print(
                             f"Erro semântico: A Variável '{self.tokens[posicao + 2]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é '{self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo']}'")
+
+                        # se depois da variável tiver um '=' e depois for 'BOOLEAN'
+                elif self.tokens[posicao + 1]['valor'] == '=' and self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo'] == 'BOOLEAN':
+
+                    if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo'] or self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == 'IDENTIFICADOR':
+                        # Salva o tipo 'BOOLEAN' na variavel
+                        self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = \
+                        self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo']
+                        # Salva o valor do 'BOOLEAN' na tabela na variavel
+                        self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['valor'] = \
+                        self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['valor']
+                        print("Análise semântica concluída: Atribuição Variaveis BOOLEAN corretas")
+                    else:
+                        print(
+                                f"Erro semântico: A Variável '{self.tokens[posicao + 2]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é '{self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo']}'")
+
+                elif self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo'] == 'IDENTIFICADOR':
+                    print(
+                            f"Erro semântico: A Variável {self.tokens[posicao + 2]['valor']} na linha {self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['linha']} não foi declarada")
 
     def verifica_atribuicao_variavel_tipada(self):
 
@@ -137,11 +156,11 @@ class AnalisadorSemantico:
                                         f"Erro semântico: A Variável '{self.tokens[posicao + 1]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é 'BOOLEAN'")
                             # Verifica se depois do '=' é um valor 'BOOLEAN' e se depois vem ';'
 
-                    elif self.tokens[posicao + 3]['tipo'] == 'IDENTIFICADOR' and self.tokens[posicao + 4][
+                    elif self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo'] in ['INT', 'BOOLEAN'] and self.tokens[posicao + 4][
                                 'tipo'] == ';':
                             # Verifica se a variavel declarada é INT ou 'IDENTIFICADOR' e se seu tipo é direfente de 'INT'
-                            if self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] != 'BOOLEAN' and self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo'] != 'BOOLEAN' and \
-                                    self.tokens[posicao]['tipo'] != 'BOOLEAN':
+                            if self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo'] == 'INT' and \
+                                    self.tokens[posicao]['tipo'] == 'INT':
                                 # Salva o valor  na variavel
                                 self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = \
                                     self.tokens[posicao + 3]['valor']
@@ -168,53 +187,9 @@ class AnalisadorSemantico:
                                 print(
                                     f"Erro semântico: A Variável '{self.tokens[posicao + 3]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é 'BOOLEAN'")
 
-        print(self.tabela_simbolos)
-
-
-    def verifica_tipo_atribuicao_variavel(self):
-
-        # Função de Python que intera com o vetor
-        # para captura valores proximo do vetor
-        iterador = iter(self.tokens)
-
-        # Inicializando a variável do elemento anterior
-        anterior = next(iterador)
-
-        # Loop para acessar cada elemento e seu próximo elemento consecutivo
-        for atual, proximo, proximo_do_proximo in zip(self.tokens, self.tokens[1:], self.tokens[2:]):
-            if atual['tipo'] in ['INT', 'BOOLEAN']:
-                if proximo['tipo'] == 'IDENTIFICADOR':
-                        print("Análise semântica concluída: Variaveis corretas")
-
-                else:
-                    print(
-                        f"Erro semântico: É esperado uma Variável e foi passado '{proximo['valor']}' na linha  {atual['linha']}")
-        print(self.tabela_simbolos)
-    def verifica_tipagem_variavel(self):
-
-        # Função de Python que intera com o vetor
-        # para captura valores proximo do vetor
-        iterador = iter(self.tokens)
-
-        # Inicializando a variável do elemento anterior
-        anterior = next(iterador)
-
-        # Loop para acessar cada elemento e seu próximo elemento consecutivo
-        for atual, proximo, proximo_do_proximo in zip(self.tokens, self.tokens[1:], self.tokens[2:]):
-            if atual['tipo'] in ['INT', 'BOOLEAN']:
-                if proximo['tipo'] == 'IDENTIFICADOR':
-                        print("Análise semântica concluída: Variaveis corretas")
-                        # Atualiza o valor da tabela de Símbolos
-                        for identificador, info in tabela_simbolos.tabela.items():
-                            if identificador == proximo['valor']:
-                                #Atribui o valor INTEIRO a variável
-                                info['tipo'] = atual['tipo']
-                elif proximo['tipo'] == 'FUNC':
-                        print("Análise semântica concluída: Variaveis corretas")
-                else:
-                    print(
-                        f"Erro semântico: É esperado uma Variável e foi passado '{proximo['valor']}' na linha  {atual['linha']}")
-        print(self.tabela_simbolos)
+                    elif self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo'] == 'IDENTIFICADOR':
+                        print(
+                            f"Erro semântico: A Variável {self.tokens[posicao + 3]['valor']} na linha {self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['linha']} não foi declarada")
 
     def verifica_chamada_funcao(self):
         # Função de Python que intera com o vetor
@@ -456,7 +431,7 @@ class AnalisadorSemantico:
             print("Análise semântica concluída: Operacões estão corretas")
         else:
             print(
-                f"Erro semântico: Erro na Operacao, variável não inicializada")
+                f"Erro semântico: Variável não inicializada")
 
 
 
@@ -480,6 +455,7 @@ class AnalisadorSemantico:
         self.verifica_variavel_chamada_condicional()
         self.verifica_variavel_chamada_enquanto()
         self.verifica_declaracao_variavel_operacao()
+        print(self.tabela_simbolos)
 
 
 
