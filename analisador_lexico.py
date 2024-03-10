@@ -58,7 +58,7 @@ class AnalisadorLexico:
                             self.linhas[i] = linha_codigo.replace(identificador, '', 1)
                             break
 
-                    if identificador == 'true' or identificador == 'false':
+                    if identificador == 'true' or identificador == 'false' or identificador == 'boolean':
                         self.tokens.append(
                             {'tipo': 'BOOLEAN', 'valor': identificador, 'linha': linha})
                     else:
@@ -153,7 +153,7 @@ class AnalisadorLexico:
                 self.indice += 1
 
 
-        # Imprimindo os valores do dicionário
+        # Adicionando Tokens na Tabela
         for token in self.tokens:
 
             # Verifica se é uma palavra-chave ou identificador e adiciona ao token

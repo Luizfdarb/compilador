@@ -27,7 +27,7 @@ class AnalisadorSemantico:
                     f"Erro semântico: O programa deve começar com a palavra-chave  seguida por um identificador linha {self.tokens[0]['linha']}.")
                 break
 
-    def verifica_declaracao_variavel(self):
+    def verifica_declaracao_variavel_tipo(self):
 
         # Função de Python que intera com o vetor
         # para captura valores proximo do vetor
@@ -38,35 +38,111 @@ class AnalisadorSemantico:
 
         # Loop para acessar cada elemento e seu próximo elemento consecutivo
         for atual, proximo, proximo_do_proximo in zip(self.tokens, self.tokens[1:], self.tokens[2:]):
-            if atual['tipo'] == 'IDENTIFICADOR' and proximo['tipo'] == 'OP_RELACIONAL':
-                if proximo_do_proximo['tipo'] == 'NUMERO':
-                    # Atualiza o valor da tabela de Símbolos
-                    for identificador, info in tabela_simbolos.tabela.items():
-                        if identificador == atual['valor']:
-                            # Atribui o valor INTEIRO a variável
-                            info['valor'] = proximo_do_proximo['valor']
 
-                elif proximo_do_proximo['tipo'] == 'IDENTIFICADOR':
-                    # Atualiza o valor da tabela de Símbolos
-                    for identificador, info in tabela_simbolos.tabela.items():
-                        if identificador == atual['valor']:
-                            # Atribui o valor INTEIRO a variável
-                            info['valor'] = proximo_do_proximo['valor']
+            # Se a variável for iniciado como INT
+            if atual['tipo'] == 'INT' and proximo['tipo'] == 'IDENTIFICADOR':
+                # Atualiza o valor da tabela de Símbolos
+                for identificador, info in tabela_simbolos.tabela.items():
+                    if identificador == proximo['valor']:
+                        # Atribui o valor INTEIRO a variável
+                        info['tipo'] = atual['tipo']
+                print("Análise semântica concluída: Variaveis corretas")
 
-                elif proximo_do_proximo['tipo'] == 'BOOLEAN':
-                    # Atualiza o valor da tabela de Símbolos
-                    for identificador, info in tabela_simbolos.tabela.items():
-                        if identificador == atual['valor']:
-                            # Atribui o valor INTEIRO a variável
-                            info['valor'] = proximo_do_proximo['valor']
-                    print("Análise semântica concluída: Variaveis corretas")
+            # Se a variável for iniciado como BOOLEAN
+            elif atual['tipo'] == 'BOOLEAN' and proximo['tipo'] == 'IDENTIFICADOR':
+                # Atualiza o valor da tabela de Símbolos
+                for identificador, info in tabela_simbolos.tabela.items():
+                    if identificador == proximo['valor']:
+                        # Atribui o valor INTEIRO a variável
+                        info['tipo'] = atual['tipo']
+                print("Análise semântica concluída: Variaveis corretas")
+
+        print(self.tabela_simbolos)
+
+    def verifica_atribuicao_variavel(self):
+
+        # Função de Python que intera com o vetor
+        # para captura valores proximo do vetor
+        iterador = iter(self.tokens)
+
+        # Inicializando a variável do elemento anterior
+        anterior = next(iterador)
+
+        # Percorre os a lista de tokens
+        for posicao, token in enumerate(self.tokens):
+           # Se atribuição for X = 1;
+            if token['tipo'] == 'IDENTIFICADOR' and self.tokens[posicao + 1]['valor'] == '=':
+                # se for um valor numerico atribuido
+                if self.tokens[posicao + 2]['tipo'] == 'NUMERO':
+                    # Salva o tipo INT na variavel
+                    self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = 'INT'
+                    # Salva o do NUMERO na variavel
+                    self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['valor'] = self.tokens[posicao + 2]['valor']
+                    print("Análise semântica concluída: Atribuição Variaveis INT corretas")
+
+                    # se for um valor numerico atribuido
+                elif self.tokens[posicao + 2]['tipo'] == 'BOOLEAN':
+                    # Salva o tipo BOOLEAN na variavel
+                    self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = 'BOOLEAN'
+                    # Salva o valor booleano na variavel
+                    self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['valor'] = \
+                    self.tokens[posicao + 2]['valor']
+                    print("Análise semântica concluída: Atribuição Variaveis INT corretas")
+    def verifica_atribuicao_variavel_tipada(self):
+
+        # Função de Python que intera com o vetor
+        # para captura valores proximo do vetor
+        iterador = iter(self.tokens)
+
+        # Inicializando a variável do elemento anterior
+        anterior = next(iterador)
+
+        # print(tabela_simbolos)
+        for posicao, token in enumerate(self.tokens):
+            # Se atribuição for INT X = Y;
+            if token['tipo'] == 'INT' and self.tokens[posicao + 4]['valor'] == ';':
+                # Verifica se a atribuição inicial é igual variavel que ele recebe
+                # Busca na tabela se a variavel foi adicionada
+                if token['tipo'] == 'INT' == self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo']:
+                    # Carregar a valor da tabela e atribui a ele valor da variavel passada
+                    self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = self.tokens[posicao + 3]['valor']
+                    print("Análise semântica concluída: Atribuição Variaveis INT corretas")
+                else:
+                    print(
+                        f"Erro semântico: A Variável '{self.tokens[posicao + 3]['valor']}' na linha {self.tokens[posicao + 3]['linha']} não é 'INT'")
+
+            elif token['tipo'] == 'BOOLEAN' and self.tokens[posicao + 4]['valor'] == ';':
+                # Verifica se a atribuição inicial é igual variavel que ele recebe
+                # Busca na tabela se a variavel foi adicionada
+                if token['tipo'] == 'BOOLEAN' == self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo']:
+                    # Carregar a valor da tabela e atribui a ele valor da variavel passada
+                    self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = self.tokens[posicao + 3]['valor']
+                    print("Análise semântica concluída: Atribuição Variaveis BOOLEAN corretas")
+                else:
+                    print(
+                        f"Erro semântico: A Variável '{self.tokens[posicao + 3]['valor']}' na linha {self.tokens[posicao + 3]['linha']} não é 'BOOLEAN'")
+        print(self.tabela_simbolos)
+
+
+    def verifica_tipo_atribuicao_variavel(self):
+
+        # Função de Python que intera com o vetor
+        # para captura valores proximo do vetor
+        iterador = iter(self.tokens)
+
+        # Inicializando a variável do elemento anterior
+        anterior = next(iterador)
+
+        # Loop para acessar cada elemento e seu próximo elemento consecutivo
+        for atual, proximo, proximo_do_proximo in zip(self.tokens, self.tokens[1:], self.tokens[2:]):
+            if atual['tipo'] in ['INT', 'BOOLEAN']:
+                if proximo['tipo'] == 'IDENTIFICADOR':
+                        print("Análise semântica concluída: Variaveis corretas")
 
                 else:
                     print(
-                        f"Erro semântico: É esperado uma Variável, INT ou BOOLEAN, foi passado '{proximo_do_proximo['valor']}' na linha  {atual['linha']}")
-                    break
-        print(tabela_simbolos)
-
+                        f"Erro semântico: É esperado uma Variável e foi passado '{proximo['valor']}' na linha  {atual['linha']}")
+        print(self.tabela_simbolos)
     def verifica_tipagem_variavel(self):
 
         # Função de Python que intera com o vetor
@@ -78,17 +154,20 @@ class AnalisadorSemantico:
 
         # Loop para acessar cada elemento e seu próximo elemento consecutivo
         for atual, proximo, proximo_do_proximo in zip(self.tokens, self.tokens[1:], self.tokens[2:]):
-            if atual['tipo'] == 'INT':
+            if atual['tipo'] in ['INT', 'BOOLEAN']:
                 if proximo['tipo'] == 'IDENTIFICADOR':
                         print("Análise semântica concluída: Variaveis corretas")
-                        break
+                        # Atualiza o valor da tabela de Símbolos
+                        for identificador, info in tabela_simbolos.tabela.items():
+                            if identificador == proximo['valor']:
+                                #Atribui o valor INTEIRO a variável
+                                info['tipo'] = atual['tipo']
                 elif proximo['tipo'] == 'FUNC':
                         print("Análise semântica concluída: Variaveis corretas")
-                        break
                 else:
                     print(
                         f"Erro semântico: É esperado uma Variável e foi passado '{proximo['valor']}' na linha  {atual['linha']}")
-                    break
+        print(self.tabela_simbolos)
 
     def verifica_chamada_funcao(self):
         # Função de Python que intera com o vetor
@@ -109,7 +188,7 @@ class AnalisadorSemantico:
                     else:
                         print(
                         f"Erro semântico: Erro chamada de Função, ela não foi declarada")
-                        break
+
 
     def verifica_quantidade_parametro_funcao(self):
 
@@ -343,8 +422,10 @@ class AnalisadorSemantico:
 
     def realizar_analise_semantica(self, tokens):
         self.verifica_chamada_programa()
-        self.verifica_declaracao_variavel()
-        self.verifica_tipagem_variavel()
+        self.verifica_declaracao_variavel_tipo()
+
+        self.verifica_atribuicao_variavel()
+        self.verifica_atribuicao_variavel_tipada()
         self.verifica_chamada_funcao()
         self.verifica_quantidade_parametro_funcao()
         self.verifica_tipo_parametro_funcao()

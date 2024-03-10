@@ -286,31 +286,3 @@ class AnalisadorSintatico:
         else:
             raise SyntaxError("Erro de sintaxe: Bloco de procedimento mal formado")
 
-# vetor = ['atribuicao',
-#          'chamada_funcao',
-#          'chamada_procedimento',
-#          'declaracao_procedimento',
-#          'declaracao_funcao',
-#          'declaracao_variavel',
-#          'enquanto',
-#          'escrita',
-#          'operacoes'
-#          ]
-#
-# # Nome do arquivo contendo o código
-# codigo = "exemplo_codigo/" + vetor[7] + ".txt"
-#
-# # Carrega o código de um arquivo TXT
-# programa_exemplo = AnalisadorLexico(codigo)
-#
-# # Obtém os tokens do programa
-# tokens_encontrados,_ = programa_exemplo.carregar_tokens()
-#
-# # Obtém a tabela de Símbolos
-# _,tabela_simbolos = programa_exemplo.carregar_tokens()
-#
-# print(tabela_simbolos)
-#
-# # Crie uma instância do analisador sintático e realize a análise
-# analisador = AnalisadorSintatico(tokens_encontrados)
-# analisador.analise_sintatica()
