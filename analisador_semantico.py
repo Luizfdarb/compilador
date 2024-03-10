@@ -28,99 +28,146 @@ class AnalisadorSemantico:
                 break
 
     def verifica_declaracao_variavel_tipo(self):
+        # Percorre os a lista de tokens
+        for posicao, token in enumerate(self.tokens):
+            # Verifica se a linha começa com 'INT'
+            if self.tokens[posicao]['tipo'] == 'INT' and self.tokens[posicao + 1]['tipo'] == 'IDENTIFICADOR':
+                # Verifica se a declaração é 'INT A;'
+                if self.tokens[posicao + 2]['valor'] == ';':
+                    # Verifica se a variavel já foi declarada
+                    if self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] == 'IDENTIFICADOR':
+                        self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] = 'INT'
+                    else:
+                        print(
+                            f"Erro semântico: A Variável '{self.tokens[posicao + 1]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['linha']} não é 'INT'")
 
-        # Função de Python que intera com o vetor
-        # para captura valores proximo do vetor
-        iterador = iter(self.tokens)
-
-        # Inicializando a variável do elemento anterior
-        anterior = next(iterador)
-
-        # Loop para acessar cada elemento e seu próximo elemento consecutivo
-        for atual, proximo, proximo_do_proximo in zip(self.tokens, self.tokens[1:], self.tokens[2:]):
-
-            # Se a variável for iniciado como INT
-            if atual['tipo'] == 'INT' and proximo['tipo'] == 'IDENTIFICADOR':
-                # Atualiza o valor da tabela de Símbolos
-                for identificador, info in tabela_simbolos.tabela.items():
-                    if identificador == proximo['valor']:
-                        # Atribui o valor INTEIRO a variável
-                        info['tipo'] = atual['tipo']
-                print("Análise semântica concluída: Variaveis corretas")
-
-            # Se a variável for iniciado como BOOLEAN
-            elif atual['tipo'] == 'BOOLEAN' and proximo['tipo'] == 'IDENTIFICADOR':
-                # Atualiza o valor da tabela de Símbolos
-                for identificador, info in tabela_simbolos.tabela.items():
-                    if identificador == proximo['valor']:
-                        # Atribui o valor INTEIRO a variável
-                        info['tipo'] = atual['tipo']
-                print("Análise semântica concluída: Variaveis corretas")
-
-        print(self.tabela_simbolos)
+            elif self.tokens[posicao]['tipo'] == 'BOOLEAN' and self.tokens[posicao + 1]['tipo'] == 'IDENTIFICADOR':
+                # Verifica se a declaração é 'BOOLEAN A;'
+                if self.tokens[posicao + 2]['valor'] == ';':
+                    # Verifica se a variavel já foi declarada
+                    if self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])[
+                            'tipo'] == 'IDENTIFICADOR':
+                        self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] = 'BOOLEAN'
+                    else:
+                        print(
+                                f"Erro semântico: A Variável '{self.tokens[posicao + 1]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['linha']} não é 'INT'")
 
     def verifica_atribuicao_variavel(self):
 
-        # Função de Python que intera com o vetor
-        # para captura valores proximo do vetor
-        iterador = iter(self.tokens)
+        # Percorre os a lista de tokens
+        for posicao, token in enumerate(self.tokens):
+           # Se inicio não tiver 'INT' e 'BOOLEAN' e a atribuição for X = 1;
+            if self.tokens[posicao - 1]['tipo'] not in ['INT', 'BOOLEAN'] and token['tipo'] == 'IDENTIFICADOR' and self.tokens[posicao + 1]['valor'] == '=' and self.tokens[posicao + 3]['valor'] == ';':
+                # se for um valor numerico atribuido
+                if self.tokens[posicao + 2]['tipo'] == 'NUMERO':
+                    if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] != 'BOOLEAN':
+                        # Salva o tipo INT na variavel
+                        self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = 'INT'
+                        # Salva o do NUMERO na variavel
+                        self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['valor'] = self.tokens[posicao + 2]['valor']
+                        print("Análise semântica concluída: Atribuição Variaveis INT corretas")
+                    else:
+                        print(
+                            f"Erro semântico: A Variável '{self.tokens[posicao]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é 'INT'")
 
-        # Inicializando a variável do elemento anterior
-        anterior = next(iterador)
+                # se for um valor 'BOOLEAN' atribuido
+                elif self.tokens[posicao + 2]['tipo'] == 'BOOLEAN':
+                    if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] != 'INT':
+                        # Salva o tipo BOOLEAN na variavel
+                        self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = 'BOOLEAN'
+                        # Salva o valor booleano na variavel
+                        self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['valor'] = \
+                        self.tokens[posicao + 2]['valor']
+                        print("Análise semântica concluída: Atribuição Variaveis BOOLEAN corretas")
+                    else:
+                        print(
+                                f"Erro semântico: A Variável '{self.tokens[posicao]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é 'BOOLEAN'")
+
+
+                # se depois da variável tiver um '=' e depois for 'IDENTIFICADOR'
+                elif self.tokens[posicao + 1]['valor'] == '=' and self.tokens[posicao + 2]['tipo'] == 'IDENTIFICADOR':
+                    if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo'] or self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == 'IDENTIFICADOR':
+                       # Salva o tipo 'IDENTIFICADOR' na variavel
+                        self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo']
+                        # Salva o valor do 'IDENTIFICADOR' na tabela na variavel
+                        self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['valor'] = \
+                        self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['valor']
+                        print("Análise semântica concluída: Atribuição Variaveis IDENTIFICADOR corretas")
+                    else:
+                        print(
+                            f"Erro semântico: A Variável '{self.tokens[posicao + 2]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é '{self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo']}'")
+
+    def verifica_atribuicao_variavel_tipada(self):
 
         # Percorre os a lista de tokens
         for posicao, token in enumerate(self.tokens):
-           # Se atribuição for X = 1;
-            if token['tipo'] == 'IDENTIFICADOR' and self.tokens[posicao + 1]['valor'] == '=':
-                # se for um valor numerico atribuido
-                if self.tokens[posicao + 2]['tipo'] == 'NUMERO':
-                    # Salva o tipo INT na variavel
-                    self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = 'INT'
-                    # Salva o do NUMERO na variavel
-                    self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['valor'] = self.tokens[posicao + 2]['valor']
-                    print("Análise semântica concluída: Atribuição Variaveis INT corretas")
+            # Verifica se a atribuição é 'INT a = valor;'
+            if self.tokens[posicao]['tipo'] in ['INT', 'BOOLEAN'] and self.tokens[posicao + 1]['tipo'] == 'IDENTIFICADOR' and self.tokens[posicao + 2]['valor'] == '=':
+                # Verifica se não ultrapassa o tamanho
+                # da lista de tokens
+                if posicao + 4 < len(self.tokens):
+                    # Verifica se depois do '=' é um valor numerico e se depois vem ';'
+                    if self.tokens[posicao + 3]['tipo'] == 'NUMERO' and self.tokens[posicao + 4]['tipo'] == ';':
+                        #
+                        if self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] != 'BOOLEAN' and self.tokens[posicao]['tipo'] != 'BOOLEAN':
+                            # Salva o do NUMERO na variavel
+                            self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = \
+                            self.tokens[posicao + 3]['valor']
+                            # Salva o tipo na variavel
+                            self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] = \
+                                self.tokens[posicao]['tipo']
+                            print("Análise semântica concluída: Atribuição Variaveis INT corretas")
+                        else:
+                            print(
+                                f"Erro semântico: A Variável '{self.tokens[posicao + 1]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é 'INT'")
 
-                    # se for um valor numerico atribuido
-                elif self.tokens[posicao + 2]['tipo'] == 'BOOLEAN':
-                    # Salva o tipo BOOLEAN na variavel
-                    self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = 'BOOLEAN'
-                    # Salva o valor booleano na variavel
-                    self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['valor'] = \
-                    self.tokens[posicao + 2]['valor']
-                    print("Análise semântica concluída: Atribuição Variaveis INT corretas")
-    def verifica_atribuicao_variavel_tipada(self):
+                    # Verifica se depois do '=' é um valor 'BOOLEAN' e se depois vem ';'
+                    elif self.tokens[posicao + 3]['tipo'] == 'BOOLEAN' and self.tokens[posicao + 4]['tipo'] == ';':
+                        # Verifica se a variavel declarada é INT ou 'IDENTIDADE' e se seu tipo é direfente de 'INT'
+                        if self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] != 'INT' and self.tokens[posicao]['tipo'] != 'INT':
+                            # Salva o valor  na variavel
+                            self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = \
+                            self.tokens[posicao + 3]['valor']
+                            # Salva o Tipo na variavel
+                            self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] = \
+                                self.tokens[posicao]['tipo']
+                            print("Análise semântica concluída: Atribuição Variaveis BOOLEANAS corretas")
+                        else:
+                            print(
+                                        f"Erro semântico: A Variável '{self.tokens[posicao + 1]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é 'BOOLEAN'")
+                            # Verifica se depois do '=' é um valor 'BOOLEAN' e se depois vem ';'
 
-        # Função de Python que intera com o vetor
-        # para captura valores proximo do vetor
-        iterador = iter(self.tokens)
+                    elif self.tokens[posicao + 3]['tipo'] == 'IDENTIFICADOR' and self.tokens[posicao + 4][
+                                'tipo'] == ';':
+                            # Verifica se a variavel declarada é INT ou 'IDENTIFICADOR' e se seu tipo é direfente de 'INT'
+                            if self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] != 'BOOLEAN' and self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo'] != 'BOOLEAN' and \
+                                    self.tokens[posicao]['tipo'] != 'BOOLEAN':
+                                # Salva o valor  na variavel
+                                self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = \
+                                    self.tokens[posicao + 3]['valor']
+                                # Salva o Tipo na variavel
+                                self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] = \
+                                    self.tokens[posicao]['tipo']
+                                print("Análise semântica concluída: Atribuição Variaveis corretas")
 
-        # Inicializando a variável do elemento anterior
-        anterior = next(iterador)
+                                # Verifica se a variavel declarada é INT ou 'IDENTIFICADOR' e se seu tipo é direfente de 'INT'
+                            elif self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])[
+                                    'tipo'] != 'INT' and \
+                                self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])[
+                                            'tipo'] != 'INT' and \
+                                self.tokens[posicao]['tipo'] != 'INT':
+                                # Salva o valor  na variavel
+                                self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = \
+                                        self.tokens[posicao + 3]['valor']
+                                # Salva o Tipo na variavel
+                                self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['tipo'] = \
+                                        self.tokens[posicao]['tipo']
+                                print("Análise semântica concluída: Atribuição Variaveis corretas")
 
-        # print(tabela_simbolos)
-        for posicao, token in enumerate(self.tokens):
-            # Se atribuição for INT X = Y;
-            if token['tipo'] == 'INT' and self.tokens[posicao + 4]['valor'] == ';':
-                # Verifica se a atribuição inicial é igual variavel que ele recebe
-                # Busca na tabela se a variavel foi adicionada
-                if token['tipo'] == 'INT' == self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo']:
-                    # Carregar a valor da tabela e atribui a ele valor da variavel passada
-                    self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = self.tokens[posicao + 3]['valor']
-                    print("Análise semântica concluída: Atribuição Variaveis INT corretas")
-                else:
-                    print(
-                        f"Erro semântico: A Variável '{self.tokens[posicao + 3]['valor']}' na linha {self.tokens[posicao + 3]['linha']} não é 'INT'")
+                            else:
+                                print(
+                                    f"Erro semântico: A Variável '{self.tokens[posicao + 3]['valor']}' na linha {self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['linha']} não é 'BOOLEAN'")
 
-            elif token['tipo'] == 'BOOLEAN' and self.tokens[posicao + 4]['valor'] == ';':
-                # Verifica se a atribuição inicial é igual variavel que ele recebe
-                # Busca na tabela se a variavel foi adicionada
-                if token['tipo'] == 'BOOLEAN' == self.tabela_simbolos.obter_token(self.tokens[posicao + 3]['valor'])['tipo']:
-                    # Carregar a valor da tabela e atribui a ele valor da variavel passada
-                    self.tabela_simbolos.obter_token(self.tokens[posicao + 1]['valor'])['valor'] = self.tokens[posicao + 3]['valor']
-                    print("Análise semântica concluída: Atribuição Variaveis BOOLEAN corretas")
-                else:
-                    print(
-                        f"Erro semântico: A Variável '{self.tokens[posicao + 3]['valor']}' na linha {self.tokens[posicao + 3]['linha']} não é 'BOOLEAN'")
         print(self.tabela_simbolos)
 
 
@@ -426,6 +473,7 @@ class AnalisadorSemantico:
 
         self.verifica_atribuicao_variavel()
         self.verifica_atribuicao_variavel_tipada()
+
         self.verifica_chamada_funcao()
         self.verifica_quantidade_parametro_funcao()
         self.verifica_tipo_parametro_funcao()

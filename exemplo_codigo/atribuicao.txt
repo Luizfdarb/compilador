@@ -1,11 +1,22 @@
 programa exemplo;
-a = 11111;
-b = true;
 
+int a;
+a = 1;
+int a;
+boolean b;
+a = b;
 
 int x = a;
-boolean y;
-boolean n = b;
+
+
+
+
+
+
+
+
+
+
 
 
 
