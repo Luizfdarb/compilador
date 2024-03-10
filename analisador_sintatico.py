@@ -94,15 +94,22 @@ class AnalisadorSintatico:
             raise SyntaxError(f"Erro Sintático: Faltando completar o código na linha {self.tokens[self.posicao]['linha']}")
 
     def bloco_funcao(self):
-        if self.tokens[self.posicao]['tipo'] == 'BEGIN':
-            self.avancar()
-            self.bloco()
-            if self.tokens[self.posicao]['tipo'] == 'RETURN':
-                self.avancar()
-                self.expressao()
+        self.match('BEGIN')
+        # Verifica se o bloco está vazio
+        if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
+            raise SyntaxError(
+                f"Erro de sintaxe: Bloco vazio {self.tokens[self.posicao]['linha']}")
+        while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
+            if self.tokens[self.posicao + 1]['tipo'] == 'FUNC':
+                self.declaracao_funcao()
+            else:
+                self.declaracao_variaveis()
+        while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE',                                                'PRINT']:
+            self.comando()
+        if self.tokens[self.posicao]['tipo'] == 'END':
             self.match('END')
         else:
-            raise SyntaxError("Erro de sintaxe: Bloco de função mal formado")
+            self.bloco_funcao()
 
     def expressao(self):
         self.expressao_simples()
