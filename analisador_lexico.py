@@ -177,7 +177,7 @@ class AnalisadorLexico:
                 self.tabela_simbolos.adicionar_token(token['valor'], 'OP_ARITMETICO', token['linha'])
             elif token['tipo'] == 'STRING':
                 self.tabela_simbolos.adicionar_token(token['valor'], 'STRING', token['linha'])
-            elif token['tipo'] in ';()':
+            elif token['tipo'] in ',;()':
                 self.tabela_simbolos.adicionar_token(token['valor'], 'DELIMITADOR', token['linha'])
             elif token['tipo'] == 'BOOLEAN':
                 self.tabela_simbolos.adicionar_token(token['valor'], 'BOOLEAN', token['linha'])

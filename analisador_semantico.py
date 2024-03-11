@@ -87,7 +87,7 @@ class AnalisadorSemantico:
 
                 # se depois da variável tiver um '=' e depois for 'IDENTIFICADOR'
                 elif self.tokens[posicao + 1]['valor'] == '=' and self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo'] == 'INT':
-                    if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo']:
+                    if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo'] or self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == 'IDENTIFICADOR':
                        # Salva o tipo 'IDENTIFICADOR' na variavel
                         self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] = self.tabela_simbolos.obter_token(self.tokens[posicao + 2]['valor'])['tipo']
                         # Salva o valor do 'IDENTIFICADOR' na tabela na variavel
@@ -238,6 +238,27 @@ class AnalisadorSemantico:
                                 self.tokens[posicao + 1]['valor']
                         elif self.tokens[posicao]['tipo'] == 'END':
                             break
+
+    def verifica_parametro_declarado_funcao(self):
+
+        # Percorre os a lista de tokens
+        for posicao, token in enumerate(self.tokens):
+            # Verifica se a atribuição é 'int func funcao(;'
+            if self.tokens[posicao]['tipo'] == 'INT':
+                # Encontra a Funcao
+                if self.tokens[posicao + 1]['tipo'] == 'FUNC':
+                    # Encontra o nome da funcao
+                    if self.tokens[posicao + 2]['tipo'] == 'IDENTIFICADOR':
+                        # Percorre a até achar o valor de return
+                        for posicao, token in enumerate(self.tokens[posicao:], start=posicao):
+
+                            if self.tabela_simbolos.obter_token(self.tokens[posicao]['valor'])['tipo'] == 'IDENTIFICADOR':
+                                print(
+                                    f"Erro semântico: A Variável '{self.tokens[posicao]['valor']}' na linha {self.tokens[posicao]['linha']} não foi declarada")
+                            elif self.tokens[posicao]['tipo'] == ')':
+                                print("Análise semântica concluída: Variaveis de Funcão declaradas")
+                                break
+
 
     def verifica_tipo_return_funcao(self, tipo_funcao):
         for identificador, token_info in self.tabela_simbolos.tabela.items():
@@ -510,8 +531,6 @@ class AnalisadorSemantico:
         self.verifica_atribuicao_variavel()
         self.verifica_atribuicao_variavel_tipada()
         self.verifica_declararacao_funcao()
-        #self.verifica_return_funcao()
-
 
         # self.verifica_chamada_funcao()
         self.verifica_quantidade_parametro_funcao()

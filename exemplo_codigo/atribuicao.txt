@@ -1,10 +1,12 @@
 programa exemplo;
 int a;
 a = 1;
+c = a;
+int b;
 int func declaracao_funcao(int a);
 begin
-int b;
-return b;
+
+return a;
 end
 
 
