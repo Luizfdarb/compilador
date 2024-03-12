@@ -7,6 +7,20 @@ b = 15;
 c = a + b;
 print(c);
 
+if(a >= b);
+begin
+int a;
+end
+else;
+begin
+int b;
+end
+
+while(a > b);
+begin
+int a;
+end
+
 int func declaracao_funcao(int a);
 begin
 int a;
@@ -27,44 +41,3 @@ end
 chamada_procedimento(int a);
 chamada_procedimento(int a, int b);
 chamada_procedimento(int a, int b, int c);
-
-if(a >= b);
-begin
-int a;
-end
-else;
-begin
-int b;
-end
-
-while(a > b);
-begin
-int a;
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
