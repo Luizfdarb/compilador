@@ -158,7 +158,7 @@ class AnalisadorLexico:
 
             # Verifica se é uma palavra-chave ou identificador e adiciona ao token
             palavras_reservadas = ['programa', 'int', 'func', 'begin', 'end',
-                              'return', 'if', 'else', 'while', 'break', 'continue', 'print']
+                              'if', 'else', 'while', 'break', 'continue', 'print']
 
             # Verifica se é um booleano
             tipos_boolean = ['true', 'false']
@@ -170,17 +170,19 @@ class AnalisadorLexico:
             elif token['tipo'] == 'IDENTIFICADOR':
                 self.tabela_simbolos.adicionar_token(token['valor'], token['tipo'], token['linha'])
             elif token['tipo'] == 'NUMERO':
-                self.tabela_simbolos.adicionar_token(token['valor'], 'INTEIRO', token['linha'])
+                self.tabela_simbolos.adicionar_token(token['valor'], 'INT', token['linha'])
             elif token['tipo'] == 'OP_RELACIONAL':
                 self.tabela_simbolos.adicionar_token(token['valor'], 'OP_RELACIONAL', token['linha'])
             elif token['tipo'] == 'OP_ARITMETICO':
                 self.tabela_simbolos.adicionar_token(token['valor'], 'OP_ARITMETICO', token['linha'])
             elif token['tipo'] == 'STRING':
                 self.tabela_simbolos.adicionar_token(token['valor'], 'STRING', token['linha'])
-            elif token['tipo'] in ';()':
+            elif token['tipo'] in ',;()':
                 self.tabela_simbolos.adicionar_token(token['valor'], 'DELIMITADOR', token['linha'])
             elif token['tipo'] == 'BOOLEAN':
                 self.tabela_simbolos.adicionar_token(token['valor'], 'BOOLEAN', token['linha'])
+            elif token['tipo'] == 'RETURN':
+                self.tabela_simbolos.adicionar_token(token['valor'], 'RETURN', token['linha'])
 
         # Retorna a lista de tokens encontrados
         return self.tokens, self.tabela_simbolos

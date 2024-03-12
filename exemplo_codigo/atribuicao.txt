@@ -1,12 +1,19 @@
 programa exemplo;
-
 int a;
 a = 1;
-int a;
-boolean b;
-a = b;
+c = a;
+int b;
+int func declaracao_funcao(int a);
+begin
 
-int x = a;
+return a;
+end
+
+
+
+
+
+
 
 
 
