@@ -36,13 +36,17 @@ class AnalisadorSintatico:
         if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
             raise SyntaxError(
                 f"Erro de sintaxe: Bloco vazio {self.tokens[self.posicao]['linha']}")
+        elif self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE', 'RETURN']:
+            raise SyntaxError(
+                f"Erro de sintaxe: Uso invalido de {self.tokens[self.posicao]['valor']} na linha {self.tokens[self.posicao]['linha']}")
         while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             if self.tokens[self.posicao + 1]['tipo'] == 'FUNC':
                 self.declaracao_funcao()
             else:
                 self.declaracao_variaveis()
-        while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'RETURN', 'BREAK', 'CONTINUE', 'PRINT']:
+        while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE', 'PRINT']:
             self.comando()
+
         self.bloco()
 
 
@@ -99,6 +103,10 @@ class AnalisadorSintatico:
         if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
             raise SyntaxError(
                 f"Erro de sintaxe: Bloco vazio {self.tokens[self.posicao]['linha']}")
+        if self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE']:
+            raise SyntaxError(
+                f"Erro de sintaxe: Uso invalido de {self.tokens[self.posicao]['valor']} na linha {self.tokens[self.posicao]['linha']}")
+
         while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
             if self.tokens[self.posicao + 1]['tipo'] == 'FUNC':
                 self.declaracao_funcao()
@@ -139,8 +147,13 @@ class AnalisadorSintatico:
                 self.expressao()
         elif self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
             self.identificador()
-            if self.tokens[self.posicao]['tipo'] != ';':
+            if self.tokens[self.posicao]['tipo'] != ';' and self.tokens[self.posicao]['tipo'] != '(':
                 self.expressao()
+            elif self.tokens[self.posicao]['tipo'] == '(':
+                self.match('(')
+                if self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
+                    self.parametro()
+                self.match(')')
         elif self.tokens[self.posicao]['tipo'] == 'BOOLEAN':
             self.match('BOOLEAN')
         else:
@@ -149,7 +162,7 @@ class AnalisadorSintatico:
 
     def comando(self):
         if self.tokens[self.posicao]['tipo'] == 'IDENTIFICADOR':
-            if self.posicao + 1 > len(self.tokens) and self.tokens[self.posicao + 1]['valor'] == '(':
+            if self.posicao + 1 < len(self.tokens) and self.tokens[self.posicao + 1]['valor'] == '(':
                 self.chamada_procedimento_funcao()
             else:
                 self.atribuicao()
@@ -159,8 +172,6 @@ class AnalisadorSintatico:
             self.enquanto()
         elif self.tokens[self.posicao]['tipo'] == 'RETURN':
             self.comando_retorno()
-        elif self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE']:
-            self.comando_desvio_incondicional()
         elif self.tokens[self.posicao]['tipo'] == 'PRINT':
             self.escrita()
         else:
@@ -204,18 +215,33 @@ class AnalisadorSintatico:
 
     def bloco_enquanto(self):
         self.match('BEGIN')
-        if self.tokens[self.posicao]['tipo'] in ['BREAK']:
-            while self.tokens[self.posicao]['tipo'] != ['END']:
-                self.avancar()
-        elif self.tokens[self.posicao]['tipo'] in ['CONTINUE']:
-            self.avancar()
-            self.bloco()
-        self.bloco()
-        self.match('END')
+        # Verifica se o bloco está vazio
+        if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
+            raise SyntaxError(
+                f"Erro de sintaxe: Bloco vazio {self.tokens[self.posicao]['linha']}")
+        elif self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE']:
+            self.comando_desvio_incondicional()
+        elif self.tokens[self.posicao]['tipo'] == 'RETURN':
+            raise SyntaxError(
+                f"Erro de sintaxe: Uso invalido de {self.tokens[self.posicao]['valor']} na linha {self.tokens[self.posicao]['linha']}")
+        while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
+            if self.tokens[self.posicao + 1]['tipo'] == 'FUNC':
+                self.declaracao_funcao()
+            else:
+                self.declaracao_variaveis()
+        while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE',
+                                                    'PRINT']:
+            self.comando()
+        if self.tokens[self.posicao]['tipo'] == 'END':
+            self.match('END')
+        else:
+            self.bloco_enquanto()
 
     def comando_desvio_incondicional(self):
+
         if self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE']:
             self.avancar()
+            self.match(';')
         else:
             raise SyntaxError("Erro de sintaxe: Comando de desvio incondicional inválido")
 
@@ -247,8 +273,25 @@ class AnalisadorSintatico:
 
     def bloco_condicional(self):
         self.match('BEGIN')
-        self.bloco()
-        self.match('END')
+        # Verifica se o bloco está vazio
+        if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
+            raise SyntaxError(
+                f"Erro de sintaxe: Bloco vazio {self.tokens[self.posicao]['linha']}")
+        elif self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE', 'RETURN']:
+            raise SyntaxError(
+                f"Erro de sintaxe: Uso invalido de {self.tokens[self.posicao]['valor']} na linha {self.tokens[self.posicao]['linha']}")
+        while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
+            if self.tokens[self.posicao + 1]['tipo'] == 'FUNC':
+                self.declaracao_funcao()
+            else:
+                self.declaracao_variaveis()
+        while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE',
+                                                    'PRINT']:
+            self.comando()
+        if self.tokens[self.posicao]['tipo'] == 'END':
+            self.match('END')
+        else:
+            self.bloco_condicional()
 
     def op_relacional(self):
         if self.tokens[self.posicao]['valor'] in ['==', '!=', '>', '>=', '<', '<=']:
@@ -286,10 +329,25 @@ class AnalisadorSintatico:
 
 
     def bloco_procedimento(self):
-        if self.tokens[self.posicao]['tipo'] == 'BEGIN':
-            self.avancar()
-            self.bloco()
+        self.match('BEGIN')
+        # Verifica se o bloco está vazio
+        if self.tokens[self.posicao]['tipo'] == 'END' and self.tokens[self.posicao - 1]['tipo'] == 'BEGIN':
+            raise SyntaxError(
+                f"Erro de sintaxe: Bloco vazio {self.tokens[self.posicao]['linha']}")
+        elif self.tokens[self.posicao]['tipo'] in ['BREAK', 'CONTINUE', 'RETURN']:
+            raise SyntaxError(
+                f"Erro de sintaxe: Uso invalido de {self.tokens[self.posicao]['valor']} na linha {self.tokens[self.posicao]['linha']}")
+
+        while self.tokens[self.posicao]['tipo'] in ['INT', 'BOOLEAN']:
+            if self.tokens[self.posicao + 1]['tipo'] == 'FUNC':
+                self.declaracao_funcao()
+            else:
+                self.declaracao_variaveis()
+        while self.tokens[self.posicao]['tipo'] in ['IDENTIFICADOR', 'IF', 'WHILE',
+                                                    'PRINT']:
+            self.comando()
+        if self.tokens[self.posicao]['tipo'] == 'END':
             self.match('END')
         else:
-            raise SyntaxError("Erro de sintaxe: Bloco de procedimento mal formado")
+            self.bloco_procedimento()
 
