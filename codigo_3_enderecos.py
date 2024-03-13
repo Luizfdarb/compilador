@@ -1,39 +1,82 @@
 from analisador_lexico import AnalisadorLexico
-from analisador_semantico import AnalisadorSemantico
-from analisador_sintatico import *
-from tabela_simbolos import *
+
+def gerar_codigo_tres_enderecos(tokens):
+    codigo_tres_enderecos = []
+    temporarios = []
+    prox_temporario = 0
+
+    # Função auxiliar para obter um nome de temporário único
+    def novo_temporario():
+        nonlocal prox_temporario
+        temporario = f"t{prox_temporario}"
+        prox_temporario += 1
+        return temporario
+
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+
+        # Atribuição
+        if token['tipo'] == 'IDENTIFICADOR' and tokens[i + 1]['valor'] == '=':
+            resultado = token['valor']
+            operando = tokens[i + 2]['valor']
+            if tokens[i + 2]['tipo'] == 'IDENTIFICADOR' or tokens[i + 2]['tipo'] == 'NUMERO' or tokens[i + 2]['tipo'] == 'BOOLEAN':
+                operando = tokens[i + 2]['valor']
+
+            # Operações aritméticas
+            if i + 3 < len(tokens) and tokens[i + 3]['tipo'] == 'OP_ARITMETICO':
+                operando1 = operando
+                operando2 = tokens[i + 4]['valor']
+                temporario = novo_temporario()
+                codigo_tres_enderecos.append(f"{temporario} = {operando1} {tokens[i + 3]['valor']} {operando2}")
+                operando = temporario
+                i += 2
+
+            codigo_tres_enderecos.append(f"{resultado} = {operando}")
+            i += 3
+
+        # Condicional
+        elif token['valor'] == 'if':
+            condicao = f"{tokens[i + 1]['valor']} {tokens[i + 2]['valor']} {tokens[i + 3]['valor']}"
+            codigo_tres_enderecos.append(f"if {condicao} goto L1")
+            i += 4  # Pula para o próximo token após a condição
+            codigo_tres_enderecos.append(f"goto L2")
+            codigo_tres_enderecos.append(f"L1:")
+            while tokens[i]['valor'] != 'begin':
+                i += 1
+            i += 1
+
+        elif token['valor'] == 'begin':
+            while tokens[i]['valor'] != 'end':
+                i += 1
+            i += 1
+
+        # While
+        elif token['valor'] == 'while':
+            codigo_tres_enderecos.append(f"L3:")
+            condicao = f"{tokens[i + 1]['valor']} {tokens[i + 2]['valor']} {tokens[i + 3]['valor']}"
+            codigo_tres_enderecos.append(f"if {condicao} goto L4")
+            i += 4  # Pula para o próximo token após a condição
+            codigo_tres_enderecos.append(f"goto L5")
+            codigo_tres_enderecos.append(f"L4:")
+            while tokens[i]['valor'] != 'begin':
+                i += 1
+            i += 1
+
+        # funcao
+        elif token['tipo'] == 'FUNC':
+            print('funcooooooo')
+            i += 1
+
+        else:
+            print(token['tipo'])
+            i += 1
 
 
 
+    return codigo_tres_enderecos
 
-
-variaveis_declaradas = []
-variaveis_operacoes = []
-
-linha_declaracao = 0;
-linha_operacao = 0;
-
-encontrar_igual = False
-
-
-
-
-
-vetor = ['atribuicao',
-         'chamada_funcao',
-         'chamada_procedimento',
-         'declaracao_funcao',
-         'declaracao_procedimento',
-         'condicional',
-         'declaracao_funcao',
-         'declaracao_variavel',
-         'enquanto',
-         'escrita',
-         'operacoes'
-         ]
-
-# Carrega arquivo
-codigo = "exemplo_codigo/" + vetor[10] + ".txt"
+codigo = "exemplo_codigo.txt"
 
 # Carrega o código de um arquivo TXT
 programa_exemplo = AnalisadorLexico(codigo)
@@ -41,37 +84,10 @@ programa_exemplo = AnalisadorLexico(codigo)
 # Obtém os tokens do programa
 tokens_encontrados, tabela_simbolos = programa_exemplo.carregar_tokens()
 
-# print(tabela_simbolos)
-for token in tokens_encontrados:
-    print(token)
+# Gera o código de três endereços a partir dos tokens encontrados
+codigo = gerar_codigo_tres_enderecos(tokens_encontrados)
 
-# Crie uma instância do analisador sintático e realize a análise
-analisador = AnalisadorSintatico(tokens_encontrados, codigo)
-analisador.analise_sintatica()
-
-# Crie uma instância do analisador semântico e realize a análise
-analisador_semantico = AnalisadorSemantico(tabela_simbolos, tokens_encontrados)
-analisador_semantico.realizar_analise_semantica(tokens_encontrados)
-
-
-codigo_tres_enderecos = [
-    "T1 = 1 + b",
-    "T2 = T1 + c",
-    "a = T2"
-]
-
-
-for atual, proximo, proximo_do_proximo in zip(tokens_encontrados, tokens_encontrados[1:], tokens_encontrados[2:]):
-    print('Atual', atual)
-    print('prox', proximo)
-    print('prox_prox', proximo_do_proximo)
-
-    if atual['tipo'] == 'IDENTIFICADOR' and proximo['tipo'] == 'OP_RELACIONAL':
-        print('entrouuu.....................')
-        if proximo_do_proximo['tipo'] == 'NUMERO':
-            print('Funcionando ............')
-
-
-
-
-
+# Imprime o código de três endereços gerado
+for instrucao in codigo:
+    print(instrucao)
+    print()  # Adiciona uma linha em branco após cada instrução
