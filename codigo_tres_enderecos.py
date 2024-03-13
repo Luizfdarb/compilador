@@ -5,7 +5,7 @@ from tabela_simbolos import *
 
 class CodigoTresEnderecos:
     def __init__(self, tokens_encontrados, tabela_simbolos):
-        self.codigo = []
+        self.temporarios = []
         self.tokens = tokens_encontrados
         self.tabela_simbolos = tabela_simbolos
         self.nome_arquivo = "codigo_enderecos.txt"
@@ -13,15 +13,28 @@ class CodigoTresEnderecos:
 
     def salvar_codigo_tres_enderecos(self, nome_arquivo):
 
+        contador = 0;
+
 
         with open(nome_arquivo, 'w') as arquivo:
             for posicao, token in enumerate(self.tokens):
-                print(posicao)
 
                 # Verifica inicialização de variável
                 if self.tokens[posicao]['tipo'] in ['INT', 'BOOLEAN']:
                     if self.tokens[posicao + 1]['tipo'] == 'IDENTIFICADOR':
                         arquivo.write(str(self.tokens[posicao + 1]['valor']) + '\n')
+                    elif self.tokens[posicao + 1]['tipo'] == 'FUNC':
+                        if self.tokens[posicao + 2]['tipo'] == 'IDENTIFICADOR':
+                            if self.tokens[posicao + 2]['tipo'] == '(':
+                                for posicao, token in enumerate(self.tokens[posicao + 2:], start=posicao + 2):
+                                    if self.tokens[posicao]['tipo'] != ')':
+                                        # Adiciona uma variavel no contador
+                                        contador += 1
+                                        # Adiciona as variaveis ao vetor
+                                        self.temporarios.append(self.tokens[posicao]['valor'])
+                                        arquivo.write('param ' + str(self.tokens[posicao]['valor']) + '\n')
+                                    else:
+                                        break
 
 
 
@@ -33,13 +46,41 @@ class CodigoTresEnderecos:
                                 arquivo.write(str(self.tokens[posicao]['valor']) + ' = ' + str(self.tokens[posicao + 2]['valor']) + '\n')
                             # Verifica atribuição de variável
                             elif self.tokens[posicao + 3]['tipo'] == 'OP_ARITMETICO':
+                                # Adiciona uma variavel no contador
+                                contador += 2
+                                # Adiciona as variaveis ao vetor
+                                self.temporarios.append(self.tokens[posicao + 2]['valor'])
+                                self.temporarios.append(self.tokens[posicao + 3]['valor'])
                                 arquivo.write(str(self.tokens[posicao]['valor']) + ' = ' + str(
                                                 self.tokens[posicao + 2]['valor']) + ' ' + str(self.tokens[posicao + 3]['valor']))
                                 for posicao, token in enumerate(self.tokens[posicao + 4:], start=posicao + 4):
-                                    print(self.tokens[posicao]['valor'])
+
                                     if self.tokens[posicao]['tipo'] != ';':
+                                        # Adiciona uma variavel no contador
+                                        contador += 1
+                                        # Adiciona as variaveis ao vetor
+                                        self.temporarios.append(self.tokens[posicao]['valor'])
                                         arquivo.write(' ' + str(self.tokens[posicao]['valor']))
                                     else:
+                                        valor_temp = 1
+                                        self.temporarios.reverse()
+                                        print(self.temporarios)
+                                        while len(self.temporarios) > 0:
+
+                                            if valor_temp == 1:
+                                               arquivo.write('\n'+f'temp{valor_temp} = {self.temporarios[2]} {self.temporarios[1]} {self.temporarios[0]}')
+                                               self.temporarios.remove(self.temporarios[2])
+                                               self.temporarios.remove(self.temporarios[1])
+                                               self.temporarios.remove(self.temporarios[0])
+
+                                            else:
+                                                arquivo.write(
+                                                    '\n' + f'temp{valor_temp} = {self.temporarios[1]} {self.temporarios[0]} temp{valor_temp - 1}')
+                                                self.temporarios.remove(self.temporarios[1])
+                                                self.temporarios.remove(self.temporarios[0])
+                                            print(self.temporarios)
+                                            valor_temp += 1
+                                        self.temporarios = []
                                         break
 
     def carrega_codigo(self):
