@@ -1,0 +1,21 @@
+a = 10
+b = 15
+d = 20
+c = a + b + d
+temp1 = b + d
+temp2 = a + temp1
+
+print a
+
+print b
+
+print c
+if ( a >= b ) goto L0
+goto L1
+L0:
+aL1:
+L2:
+if ( a > b ) goto L3
+goto L3
+L3:
+agoto L2

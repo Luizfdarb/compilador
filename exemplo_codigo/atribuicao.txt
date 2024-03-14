@@ -2,9 +2,13 @@ programa exemplo;
 int a;
 int b;
 int c;
+int d;
 a = 10;
 b = 15;
-c = a + b;
+d = 20;
+c = a + b + d;
+print(a);
+print(b);
 print(c);
 
 if(a >= b);
@@ -20,24 +24,3 @@ while(a > b);
 begin
 int a;
 end
-
-int func declaracao_funcao(int a);
-begin
-int a;
-return a;
-end
-
-a = declaracao_funcao(int a);
-
-b = chamada_funcao(int a);
-c = chamada_funcao(int a, int b);
-a = chamada_funcao(int a, int b, int c);
-
-declaracao_procedimento(int a);
-begin
-int a;
-end
-
-chamada_procedimento(int a);
-chamada_procedimento(int a, int b);
-chamada_procedimento(int a, int b, int c);
