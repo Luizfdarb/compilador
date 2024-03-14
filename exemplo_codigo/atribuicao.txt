@@ -24,3 +24,11 @@ while(a > b);
 begin
 int a;
 end
+
+declaracao_procedimento(int a);
+begin
+int a;
+end
+chamada_procedimento(int a);
+chamada_procedimento(int a, int b);
+chamada_procedimento(int a, int b, int c);

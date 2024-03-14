@@ -3,6 +3,7 @@ from analisador_sintatico import *
 from analisador_semantico import *
 from tabela_simbolos import *
 
+
 class CodigoTresEnderecos:
     def __init__(self, tokens_encontrados, tabela_simbolos):
         self.temporarios = []
@@ -21,7 +22,8 @@ class CodigoTresEnderecos:
                 # Verifica inicialização de variável
                 if self.tokens[posicao]['tipo'] in ['INT', 'BOOLEAN']:
                     if self.tokens[posicao + 1]['tipo'] == 'IDENTIFICADOR' and self.tokens[posicao + 2]['tipo'] == '(':
-                        arquivo.write(str(self.tokens[posicao + 1]['valor']) + '\n')
+                        arquivo.write(
+                            str(self.tokens[posicao + 1]['valor']) + '\n')
                     elif self.tokens[posicao + 1]['tipo'] == 'FUNC':
                         if self.tokens[posicao + 2]['tipo'] == 'IDENTIFICADOR':
                             if self.tokens[posicao + 2]['tipo'] == '(':
@@ -30,63 +32,87 @@ class CodigoTresEnderecos:
                                         # Adiciona uma variavel no contador
                                         contador += 1
                                         # Adiciona as variaveis ao vetor
-                                        self.temporarios.append(self.tokens[posicao]['valor'])
-                                        arquivo.write('param ' + str(self.tokens[posicao]['valor']) + '\n')
+                                        self.temporarios.append(
+                                            self.tokens[posicao]['valor'])
+                                        arquivo.write(
+                                            'param ' + str(self.tokens[posicao]['valor']) + '\n')
                                     else:
                                         break
 
                 # Verifica atribuição de variável
                 elif self.tokens[posicao]['tipo'] == 'IDENTIFICADOR':
                     if self.tokens[posicao + 1]['valor'] == '=':
-                        if self.tokens[posicao + 2]['tipo'] in  ['NUMERO', 'IDENTIFICADOR']:
+                        if self.tokens[posicao + 2]['tipo'] in ['NUMERO', 'IDENTIFICADOR']:
                             if self.tokens[posicao + 3]['tipo'] == ';':
-                                arquivo.write(str(self.tokens[posicao]['valor']) + ' = ' + str(self.tokens[posicao + 2]['valor']) + '\n')
+                                arquivo.write(str(
+                                    self.tokens[posicao]['valor']) + ' = ' + str(self.tokens[posicao + 2]['valor']) + '\n')
                             # Verifica atribuição de variável
                             elif self.tokens[posicao + 3]['tipo'] == 'OP_ARITMETICO':
                                 # Adiciona uma variavel no contador
                                 contador += 2
                                 # Adiciona as variaveis ao vetor
-                                self.temporarios.append(self.tokens[posicao + 2]['valor'])
-                                self.temporarios.append(self.tokens[posicao + 3]['valor'])
+                                self.temporarios.append(
+                                    self.tokens[posicao + 2]['valor'])
+                                self.temporarios.append(
+                                    self.tokens[posicao + 3]['valor'])
                                 arquivo.write(str(self.tokens[posicao]['valor']) + ' = ' + str(
-                                                self.tokens[posicao + 2]['valor']) + ' ' + str(self.tokens[posicao + 3]['valor']))
+                                    self.tokens[posicao + 2]['valor']) + ' ' + str(self.tokens[posicao + 3]['valor']))
                                 for posicao, token in enumerate(self.tokens[posicao + 4:], start=posicao + 4):
                                     if self.tokens[posicao]['tipo'] != ';':
                                         # Adiciona uma variavel no contador
                                         contador += 1
                                         # Adiciona as variaveis ao vetor
-                                        self.temporarios.append(self.tokens[posicao]['valor'])
-                                        arquivo.write(' ' + str(self.tokens[posicao]['valor']))
+                                        self.temporarios.append(
+                                            self.tokens[posicao]['valor'])
+                                        arquivo.write(
+                                            ' ' + str(self.tokens[posicao]['valor']))
                                     else:
                                         valor_temp = 1
                                         self.temporarios.reverse()
                                         while len(self.temporarios) > 0:
                                             if valor_temp == 1:
-                                               arquivo.write('\n'+f'temp{valor_temp} = {self.temporarios[2]} {self.temporarios[1]} {self.temporarios[0]}')
-                                               self.temporarios.remove(self.temporarios[2])
-                                               self.temporarios.remove(self.temporarios[1])
-                                               self.temporarios.remove(self.temporarios[0])
+                                                arquivo.write(
+                                                    '\n'+f'temp{valor_temp} = {self.temporarios[2]} {self.temporarios[1]} {self.temporarios[0]}')
+                                                self.temporarios.remove(
+                                                    self.temporarios[2])
+                                                self.temporarios.remove(
+                                                    self.temporarios[1])
+                                                self.temporarios.remove(
+                                                    self.temporarios[0])
                                             else:
                                                 arquivo.write(
                                                     '\n' + f'temp{valor_temp} = {self.temporarios[1]} {self.temporarios[0]} temp{valor_temp - 1}')
-                                                self.temporarios.remove(self.temporarios[1])
-                                                self.temporarios.remove(self.temporarios[0])
+                                                self.temporarios.remove(
+                                                    self.temporarios[1])
+                                                self.temporarios.remove(
+                                                    self.temporarios[0])
                                             valor_temp += 1
                                         arquivo.write("\n")
                                         self.temporarios = []
                                         break
 
-                # Verifica comando condicional (if ou while)
+                # Verifica comando condicional (if ou while)F
                 elif self.tokens[posicao]['tipo'] in ['IF', 'WHILE']:
                     if self.tokens[posicao]['tipo'] == 'IF':
-                        posicao = self.processa_condicional(posicao, arquivo, rotulo_count)
+                        posicao = self.processa_condicional(
+                            posicao, arquivo, rotulo_count)
                     elif self.tokens[posicao]['tipo'] == 'WHILE':
-                        posicao = self.processa_while(posicao, arquivo, rotulo_count)
+                        posicao = self.processa_while(
+                            posicao, arquivo, rotulo_count)
                     rotulo_count += 2
 
                 # Verifica comando de impressão (print)
                 elif self.tokens[posicao]['tipo'] == 'PRINT':
-                    arquivo.write("\n" + "print " + self.tokens[posicao + 2]['valor'] + "\n")
+                    arquivo.write("\n" + "print " +
+                                  self.tokens[posicao + 2]['valor'] + "\n")
+
+                # Verifica chamada de procedimento
+                elif self.tokens[posicao]['tipo'] == 'CHAMADA_PROCEDIMENTO':
+                    self.chamada_de_procedimento(arquivo)
+
+                # Verifica declaração de procedimento
+                elif self.tokens[posicao]['tipo'] == 'DECLARACAO_PROCEDIMENTO':
+                    self.declaracao_procedimento(posicao, arquivo)
 
                 # Avança para o próximo token
                 posicao += 1
@@ -136,7 +162,8 @@ class CodigoTresEnderecos:
 
         # Escreve a condição do "while"
         arquivo.write("L" + str(rotulo_count) + ":\n")
-        arquivo.write("if " + condicao + " goto L" + str(rotulo_count + 1) + "\n")
+        arquivo.write("if " + condicao + " goto L" +
+                      str(rotulo_count + 1) + "\n")
         arquivo.write("goto L" + str(rotulo_count + 1) + "\n")
         arquivo.write("L" + str(rotulo_count + 1) + ":\n")
 
@@ -150,6 +177,26 @@ class CodigoTresEnderecos:
         arquivo.write("goto L" + str(rotulo_count) + "\n")
 
         return posicao
+
+    def declaracao_procedimento(self, posicao, arquivo):
+        arquivo.write('proc ' + str(self.tokens[posicao]['valor']) + ' ')
+        posicao += 1
+        while self.tokens[posicao]['tipo'] != 'BEGIN':
+            if self.tokens[posicao]['tipo'] in ['NUMERO', 'IDENTIFICADOR']:
+                arquivo.write(str(self.tokens[posicao]['valor']) + ' ')
+            posicao += 1
+        arquivo.write('\n')
+
+    def chamada_de_procedimento(self, posicao, arquivo):
+        arquivo.write('call ' + str(self.tokens[posicao]['valor']) + ' ')
+        posicao += 1
+        while self.tokens[posicao]['tipo'] != ';':
+            if self.tokens[posicao]['tipo'] in ['NUMERO', 'IDENTIFICADOR']:
+                arquivo.write(str(self.tokens[posicao]['valor']) + ' ')
+            posicao += 1
+        arquivo.write('\n')
+
+
 
     def processa_bloco(self, posicao, arquivo):
         # Lê tokens até encontrar o fim do bloco
@@ -166,6 +213,7 @@ class CodigoTresEnderecos:
         self.carrega_codigo()
         for token in self.tokens:
             print(token)
+
 
 codigo = "exemplo_codigo/atribuicao.txt"
 
